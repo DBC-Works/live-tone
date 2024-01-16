@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+div#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  padding: env(safe-area-inset-top) calc(env(safe-area-inset-right) + 1rem)
+    env(safe-area-inset-bottom) calc(env(safe-area-inset-left) + 1rem);
+}
+
+.btn-primary svg {
+  fill: oklch(var(--pc));
+}
+.btn-primary:disabled svg {
+  fill: oklch(var(--bc) / var(--tw-text-opacity));
+}
