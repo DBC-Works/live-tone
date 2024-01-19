@@ -48,7 +48,7 @@ describe('App component', () => {
   }
 
   describe('"Run" button', () => {
-    it('should disable "Run" button if code is empty', () => {
+    it('should disable if code is empty', () => {
       // arrange & act
       setup()
 
@@ -56,7 +56,7 @@ describe('App component', () => {
       expect(screen.getByRole('button', { name: 'Run' })).toBeDisabled()
     })
 
-    it('should enable "Run" button if code is not empty', async () => {
+    it('should enable if code is not empty', async () => {
       // arrange
       setup()
 
@@ -76,7 +76,7 @@ describe('App component', () => {
       vi.resetAllMocks()
     })
 
-    it('should call `Tone.Transport.stop()` method when click `Stop` button during playing', async () => {
+    it('should call `Tone.Transport.stop()` method on click during playing', async () => {
       // arrange
       setup()
 
@@ -89,7 +89,7 @@ describe('App component', () => {
       expect(Tone.Transport.stop).toHaveBeenCalled()
     })
 
-    it('should not call `Tone.Transport.stop()` method when click `Stop` button during stopped', async () => {
+    it('should not call `Tone.Transport.stop()` method on click during stopped', async () => {
       // arrange
       setup()
 
