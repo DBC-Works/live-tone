@@ -118,7 +118,7 @@ describe('App component', () => {
       // act
       await userEvent.type(screen.getByRole('textbox'), ';')
       await userEvent.click(screen.getByRole('button', { name: 'Run' }))
-      await rerender(<AppProvider />)
+      rerender(<AppProvider />)
 
       // assert
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
@@ -135,7 +135,7 @@ describe('App component', () => {
       } catch {
         //
       }
-      await rerender(<AppProvider />)
+      rerender(<AppProvider />)
 
       // assert
       expect(screen.getByRole('alert')).toBeInTheDocument()
