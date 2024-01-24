@@ -39,7 +39,7 @@ export const CodeEditorSection: React.FC<Props> = ({
 
   return (
     <section className={`${className} flex flex-col`}>
-      <h2 className="text-base">
+      <h2 className="text-base hidden md:block">
         <label htmlFor="code">Code to run</label>
       </h2>
       <textarea

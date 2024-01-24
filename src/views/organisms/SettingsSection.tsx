@@ -11,7 +11,7 @@ export const SettingsSection: React.FC<Props> = ({
   className,
 }): JSX.Element => (
   <section className={className}>
-    <h2 className="text-base">Run settings</h2>
+    <h2 className="text-base hidden md:block">Run settings</h2>
     <div className="flex justify-end">
       <CancelTransportToggle />
     </div>
