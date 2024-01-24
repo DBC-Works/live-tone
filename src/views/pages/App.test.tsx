@@ -73,7 +73,8 @@ describe('App component', () => {
 
   describe('"Stop" button', () => {
     afterEach(() => {
-      vi.resetAllMocks()
+      Tone.Transport.stop()
+      vi.restoreAllMocks()
     })
 
     it('should call `Tone.Transport.stop()` method on click during playing', async () => {
@@ -99,6 +100,37 @@ describe('App component', () => {
 
       // assert
       expect(Tone.Transport.stop).not.toHaveBeenCalled()
+    })
+
+    it('should call `Tone.Transport.cancel()` method on click if specified', async () => {
+      // arrange
+      setup()
+
+      // act
+      await userEvent.type(screen.getByRole('textbox'), ';')
+      Tone.Transport.start()
+      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+
+      // assert
+      expect(Tone.Transport.stop).toHaveBeenCalled()
+      expect(Tone.Transport.cancel).toHaveBeenCalled()
+    })
+
+    it('should not call `Transport.cancel()` method on click if not specified', async () => {
+      // arrange
+      setup()
+
+      // act
+      await userEvent.type(screen.getByRole('textbox'), ';')
+      await userEvent.click(
+        screen.getByRole('checkbox', { name: 'cancel `transport` on stop' })
+      )
+      Tone.Transport.start()
+      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+
+      // assert
+      expect(Tone.Transport.stop).toHaveBeenCalled()
+      expect(Tone.Transport.cancel).not.toHaveBeenCalled()
     })
   })
 

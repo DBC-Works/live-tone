@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
-import { playingAtom, resetPlayingAtom } from '@/states/atoms'
+import { playingAtom, runSettingsAtom, resetPlayingAtom } from '@/states/atoms'
 import { stopPlaying } from '@/operations/toneOperations'
 // @ts-ignore
 import StopIcon from '@/assets/icons/Stop.svg?react'
@@ -12,12 +12,13 @@ import StopIcon from '@/assets/icons/Stop.svg?react'
  */
 export const StopButton: React.FC = (): JSX.Element => {
   const playingSet = useAtomValue(playingAtom)
+  const runSettings = useAtomValue(runSettingsAtom)
   const resetPlaying = useSetAtom(resetPlayingAtom)
 
   const handleClick = useCallback(() => {
-    stopPlaying(playingSet)
+    stopPlaying(runSettings, playingSet)
     resetPlaying()
-  }, [playingSet, resetPlaying])
+  }, [playingSet, runSettings, resetPlaying])
 
   return (
     <button className="btn btn-primary w-full" onClick={handleClick}>

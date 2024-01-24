@@ -1,53 +1,47 @@
 import { useEffect } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
-import { evalErrorAtom, playingAtom, resetPlayingAtom } from '@/states/atoms'
+import { runSettingsAtom, playingAtom, resetPlayingAtom } from '@/states/atoms'
 import { stopPlaying } from '@/operations/toneOperations'
-import { LiveCodeTextArea } from '@/views/organisms/LiveCodeTextArea'
-import { EvalError } from '@/views/atoms/EvalError'
 import { AppHeader } from '@/views/organisms/AppHeader'
-import { ToolBar } from '@/views/organisms/ToolBar'
+import { CodeEditorSection } from '@/views/organisms/CodeEditorSection'
+import { ToolSection } from '@/views/organisms/ToolSection'
+import { SettingsSection } from '@/views/organisms/SettingsSection'
 
 /**
  * App component
  * @returns rendering result
  */
 export const App: React.FC = (): JSX.Element => {
+  const runSettings = useAtomValue(runSettingsAtom)
   const playingSet = useAtomValue(playingAtom)
   const resetPlaying = useSetAtom(resetPlayingAtom)
-  const evalError = useAtomValue(evalErrorAtom)
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      stopPlaying(playingSet)
+      stopPlaying(runSettings, playingSet)
       resetPlaying()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [playingSet, resetPlaying])
+  }, [runSettings, playingSet, resetPlaying])
 
   return (
     <div className="h-full flex flex-col">
       <AppHeader />
-      <main className="grow">
-        <div className="flex flex-col h-full">
-          <ToolBar />
-          <div className="grow">
-            <div className="flex flex-col h-full">
-              <div className="grow mb-4">
-                <LiveCodeTextArea />
-              </div>
-              {evalError !== null && (
-                <div className="basis-1 mb-4">
-                  <EvalError />
-                </div>
-              )}
-            </div>
+      <div className="grow md:flex md:flex-row">
+        <main className="grow h-full flex flex-col md:flex-row">
+          <div className="grow flex flex-col">
+            <CodeEditorSection className="grow mb-4" />
+            <ToolSection />
           </div>
-        </div>
-      </main>
+        </main>
+        <aside className="md:ml-4">
+          <SettingsSection />
+        </aside>
+      </div>
     </div>
   )
 }
