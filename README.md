@@ -1,4 +1,4 @@
-[![Build and test](https://github.com/DBC-Works/live-tone/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/DBC-Works/live-tone/actions/workflows/build-and-test.yml)
+[![Build and test](https://github.com/DBC-Works/live-tone/actions/workflows/azure-static-web-apps-red-stone-026824a00.yml/badge.svg)](https://github.com/DBC-Works/live-tone/actions/workflows/azure-static-web-apps-red-stone-026824a00.yml)
 
 # live tone(PoC)
 
