@@ -4,6 +4,7 @@ import * as Tone from 'tone'
 
 import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
 import { registerPlaying } from '@/operations/statesOperations'
+import { Scale } from '@/utilities/music/scale'
 // @ts-ignore
 import PlayIcon from '@/assets/icons/Play.svg?react'
 
@@ -20,6 +21,7 @@ export const RunButton: React.FC = (): JSX.Element => {
       setEvalError(null)
       const LiveTone = {
         registerPlaying,
+        Scale,
       }
       new Function('Tone', 'LiveTone', `'use strict';${liveCode}`)(
         Tone,
