@@ -98,7 +98,7 @@ export class ScaleInfo {
     let noteOctave = octave
     const notes: string[] = []
     for (let index = 0; index < transportedNotes.length; ++index) {
-      if (0 < index && transportedNotes[index] === 'A') {
+      if (0 < index && transportedNotes[index] === 'C') {
         ++noteOctave
       }
       notes.push(`${transportedNotes[index]}${noteOctave}`)
