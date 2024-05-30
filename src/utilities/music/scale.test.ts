@@ -62,9 +62,6 @@ describe('Scale', () => {
     ['A#'],
     ['B'],
   ])('should start and end with "%s"', (key: string) => {
-    scales.forEach((scale) => {
-      console.log(`['${scale.rawNotes}', '${scale.name}', Scale.${scale.name}]`)
-    })
     expect(
       scales
         .map((scale) => scale.notes(key, 3, 2))
