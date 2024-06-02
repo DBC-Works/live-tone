@@ -1,5 +1,5 @@
-import { ChangeEvent, useCallback } from 'react'
-import { useAtom, useAtomValue } from 'jotai'
+import { ChangeEvent, useCallback, useEffect } from 'react'
+import { useAtom } from 'jotai'
 
 import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
 import { EvalError } from '@/views/atoms/EvalError'
@@ -15,7 +15,19 @@ export const CodeEditorSection: React.FC<Props> = ({
   className,
 }): JSX.Element => {
   const [liveCode, setLiveCode] = useAtom(liveCodeAtom)
-  const evalError = useAtomValue(evalErrorAtom)
+  const [evalError, setEvalError] = useAtom(evalErrorAtom)
+
+  useEffect(() => {
+    const handleError = (e: ErrorEvent) => {
+      if (evalError !== null) {
+        setEvalError(e.error)
+      }
+    }
+    window.addEventListener('error', handleError)
+    return () => {
+      window.removeEventListener('error', handleError)
+    }
+  }, [])
 
   const handleOnChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
