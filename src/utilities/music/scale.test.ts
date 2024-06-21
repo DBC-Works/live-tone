@@ -8,6 +8,10 @@ describe('Scale', () => {
 
   it.each([
     ['C,C#,D,D#,E,F,F#,G,G#,A,A#,B,C', 'Chromatic', Scale.Chromatic],
+    ['C,D,E,F,G,A,B,C', 'Major', Scale.Major],
+    ['C,D,D#,F,G,G#,B,C', 'Harmonic Minor', Scale.HarmonicMinor],
+    ['C,D,D#,F,G,A,B,C', 'Melodic Minor Up', Scale.MelodicMinorUp],
+    ['C,D,E,F,G,A,B,C', 'Ionian', Scale.Ionian],
     ['C,C#,D#,F,G,G#,A#,C', 'Phrygian', Scale.Phrygian],
     ['C,D,E,F#,G,A,B,C', 'Lydian', Scale.Lydian],
     ['C,D,E,F,G,A,A#,C', 'Mixolydian', Scale.Mixolydian],
