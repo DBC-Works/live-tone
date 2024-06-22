@@ -7,6 +7,7 @@ import { registerPlaying } from '@/operations/statesOperations'
 import { Ary, Itr } from '@/utilities/array'
 import { Nmb } from '@/utilities/number'
 import { Scale } from '@/utilities/music/scale'
+import { Chr } from '@/utilities/music/chord'
 // @ts-ignore
 import PlayIcon from '@/assets/icons/Play.svg?react'
 
@@ -27,6 +28,7 @@ export const RunButton: React.FC = (): JSX.Element => {
         Ary,
         Itr,
         Nmb,
+        Chr,
       }
       new Function('Tone', 'LiveTone', `'use strict';${liveCode}`)(
         Tone,
