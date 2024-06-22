@@ -108,10 +108,26 @@ export class ScaleInfo {
 }
 
 /**
+ * Major / Ionian scale note indexes
+ */
+const MajorScaleIndexes = [0, 2, 4, 5, 7, 9, 11, 12] as const
+
+/**
+ * Natural minor / Aeorian scale note indexes
+ */
+const NaturalMinorScaleIndexes = [0, 2, 3, 5, 7, 8, 10, 12] as const
+
+/**
  * Scale
  */
 export const Scale: {
   Chromatic: ScaleInfo
+
+  Major: ScaleInfo
+  NaturalMinor: ScaleInfo
+  HarmonicMinor: ScaleInfo
+  MelodicMinorUp: ScaleInfo
+
   Ionian: ScaleInfo
   Dorian: ScaleInfo
   Phrygian: ScaleInfo
@@ -144,12 +160,27 @@ export const Scale: {
   OctaveInterval: ScaleInfo
 } = {
   Chromatic: ScaleInfo.newInstance('Chromatic', null),
-  Ionian: ScaleInfo.newInstance('Ionian', [0, 2, 4, 5, 7, 9, 11, 12]),
+
+  Major: ScaleInfo.newInstance('Major', MajorScaleIndexes),
+  NaturalMinor: ScaleInfo.newInstance(
+    'Natural Minor',
+    NaturalMinorScaleIndexes
+  ),
+  HarmonicMinor: ScaleInfo.newInstance(
+    'Harmonic Minor',
+    [0, 2, 3, 5, 7, 8, 11, 12]
+  ),
+  MelodicMinorUp: ScaleInfo.newInstance(
+    'Melodic Minor Up',
+    [0, 2, 3, 5, 7, 9, 11, 12]
+  ),
+
+  Ionian: ScaleInfo.newInstance('Ionian', MajorScaleIndexes),
   Dorian: ScaleInfo.newInstance('Dorian', [0, 2, 3, 5, 7, 9, 10, 12]),
   Phrygian: ScaleInfo.newInstance('Phrygian', [0, 1, 3, 5, 7, 8, 10, 12]),
   Lydian: ScaleInfo.newInstance('Lydian', [0, 2, 4, 6, 7, 9, 11, 12]),
   Mixolydian: ScaleInfo.newInstance('Mixolydian', [0, 2, 4, 5, 7, 9, 10, 12]),
-  Aeorian: ScaleInfo.newInstance('Aeorian', [0, 2, 3, 5, 7, 8, 10, 12]),
+  Aeorian: ScaleInfo.newInstance('Aeorian', NaturalMinorScaleIndexes),
   Locrian: ScaleInfo.newInstance('Locrian', [0, 1, 3, 5, 6, 8, 10, 12]),
   MajorBlues: ScaleInfo.newInstance('Major Blues', [0, 3, 4, 7, 9, 10, 12]),
   MinorBlues: ScaleInfo.newInstance('minor Blues', [0, 3, 5, 6, 7, 10, 12]),
