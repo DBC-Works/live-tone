@@ -1,8 +1,10 @@
-import { ChangeEvent, useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useAtom } from 'jotai'
 
-import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
+import { evalErrorAtom } from '@/states/atoms'
 import { EvalError } from '@/views/atoms/EvalError'
+
+import { CodeEditor } from '@/views/atoms/CodeEditor'
 
 type Props = React.ComponentProps<'section'>
 
@@ -14,7 +16,6 @@ type Props = React.ComponentProps<'section'>
 export const CodeEditorSection: React.FC<Props> = ({
   className,
 }): JSX.Element => {
-  const [liveCode, setLiveCode] = useAtom(liveCodeAtom)
   const [evalError, setEvalError] = useAtom(evalErrorAtom)
 
   useEffect(() => {
@@ -27,14 +28,7 @@ export const CodeEditorSection: React.FC<Props> = ({
     return () => {
       window.removeEventListener('error', handleError)
     }
-  }, [])
-
-  const handleOnChange = useCallback(
-    (e: ChangeEvent<HTMLTextAreaElement>) => {
-      setLiveCode(() => e.target.value)
-    },
-    [setLiveCode]
-  )
+  }, [evalError, setEvalError])
 
   const classNames = [
     'textarea',
@@ -54,13 +48,9 @@ export const CodeEditorSection: React.FC<Props> = ({
       <h2 className="text-base hidden md:block">
         <label htmlFor="code">Code to run</label>
       </h2>
-      <textarea
-        id="code"
-        className={classNames.join(' ')}
-        spellCheck="false"
-        onChange={handleOnChange}
-        value={liveCode}
-      ></textarea>
+      <div className={classNames.join(' ')}>
+        <CodeEditor id="code" />
+      </div>
       {evalError !== null && (
         <div className="basis-1 mt-2">
           <EvalError />

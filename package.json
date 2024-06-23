@@ -12,8 +12,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "ace-builds": "^1.35.0",
     "jotai": "^2.6.1",
     "react": "^18.2.0",
+    "react-ace": "^11.0.1",
     "react-dom": "^18.2.0",
     "tone": "^14.7.77"
   },
