@@ -14,19 +14,19 @@ import { SettingsSection } from '@/views/organisms/SettingsSection'
  */
 export const App: React.FC = (): JSX.Element => {
   const runSettings = useAtomValue(runSettingsAtom)
-  const playingSet = useAtomValue(playingAtom)
+  const runningState = useAtomValue(playingAtom)
   const resetPlaying = useSetAtom(resetPlayingAtom)
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      stopPlaying(runSettings, playingSet)
+      stopPlaying(runSettings, runningState)
       resetPlaying()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [runSettings, playingSet, resetPlaying])
+  }, [runSettings, runningState, resetPlaying])
 
   return (
     <div className="h-full flex flex-col">

@@ -1,20 +1,21 @@
 import { Transport } from 'tone'
 
-import { RunSettings, Stoppable } from '@/states/types'
+import { RunningState, RunSettings } from '@/states/types'
 
 /**
  * Stop playing
- * @param playingSet play settings
- * @param playingSet registered playing set
+ * @param runSettings play settings
+ * @param registeredPlayings registered playing set
  */
 export const stopPlaying = (
   runSettings: RunSettings,
-  playingSet: Set<Stoppable>
+  runningState: RunningState
 ): void => {
-  for (const playing of playingSet) {
+  const { registeredPlayings } = runningState
+  for (const playing of registeredPlayings) {
     if ('state' in playing && playing.state !== 'stopped') {
       playing.stop()
-      playingSet.delete(playing)
+      registeredPlayings.delete(playing)
     }
   }
 

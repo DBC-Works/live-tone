@@ -11,14 +11,14 @@ import StopIcon from '@/assets/icons/Stop.svg?react'
  * @returns rendering result
  */
 export const StopButton: React.FC = (): JSX.Element => {
-  const playingSet = useAtomValue(playingAtom)
+  const runningState = useAtomValue(playingAtom)
   const runSettings = useAtomValue(runSettingsAtom)
   const resetPlaying = useSetAtom(resetPlayingAtom)
 
   const handleClick = useCallback(() => {
-    stopPlaying(runSettings, playingSet)
+    stopPlaying(runSettings, runningState)
     resetPlaying()
-  }, [playingSet, runSettings, resetPlaying])
+  }, [runningState, runSettings, resetPlaying])
 
   return (
     <button className="btn btn-primary w-full" onClick={handleClick}>

@@ -5,7 +5,17 @@
 export type Stoppable = any
 
 /**
- * Run Settings
+ * Running state
+ */
+export type RunningState = {
+  /**
+   * Registered playings
+   */
+  registeredPlayings: Set<Stoppable>
+}
+
+/**
+ * Run settings
  */
 export type RunSettings = {
   /**

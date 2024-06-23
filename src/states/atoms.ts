@@ -1,20 +1,20 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
-import { playingSet, runSettings } from './states'
+import { runningState, runSettings } from './states'
 
 /**
  * Playing management atom
  */
-export const playingAtom = atom(playingSet)
+export const playingAtom = atom(runningState)
 
 /**
  * Reset playing write-only atom
  */
 export const resetPlayingAtom = atom(null, (_, set) => {
-  set(playingAtom, (playingSet) => {
-    playingSet.clear()
-    return playingSet
+  set(playingAtom, (runningState) => {
+    runningState.registeredPlayings.clear()
+    return runningState
   })
 })
 
