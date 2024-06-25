@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import * as Tone from 'tone'
 
-import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
+import { evalErrorAtom, liveCodeAtom, playAtom } from '@/states/atoms'
 import { registerPlaying } from '@/operations/statesOperations'
 import { Ary, Itr } from '@/utilities/array'
 import { Nmb } from '@/utilities/number'
@@ -17,6 +17,7 @@ import PlayIcon from '@/assets/icons/Play.svg?react'
  */
 export const RunButton: React.FC = (): JSX.Element => {
   const liveCode = useAtomValue(liveCodeAtom)
+  const play = useSetAtom(playAtom)
   const setEvalError = useSetAtom(evalErrorAtom)
 
   const handleClick = useCallback(() => {
@@ -34,11 +35,12 @@ export const RunButton: React.FC = (): JSX.Element => {
         Tone,
         LiveTone
       )
+      play()
     } catch (e) {
       setEvalError(e as Error)
       throw e
     }
-  }, [liveCode, setEvalError])
+  }, [liveCode, setEvalError, play])
 
   return (
     <button

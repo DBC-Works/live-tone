@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
-import { runSettingsAtom, playingAtom, resetPlayingAtom } from '@/states/atoms'
+import {
+  runSettingsAtom,
+  runningStateAtom,
+  resetRunningStateAtom,
+} from '@/states/atoms'
 import { stopPlaying } from '@/operations/toneOperations'
 import { AppHeader } from '@/views/organisms/AppHeader'
 import { CodeEditorSection } from '@/views/organisms/CodeEditorSection'
@@ -14,19 +18,19 @@ import { SettingsSection } from '@/views/organisms/SettingsSection'
  */
 export const App: React.FC = (): JSX.Element => {
   const runSettings = useAtomValue(runSettingsAtom)
-  const runningState = useAtomValue(playingAtom)
-  const resetPlaying = useSetAtom(resetPlayingAtom)
+  const runningState = useAtomValue(runningStateAtom)
+  const resetRunningState = useSetAtom(resetRunningStateAtom)
 
   useEffect(() => {
     const handleBeforeUnload = () => {
       stopPlaying(runSettings, runningState)
-      resetPlaying()
+      resetRunningState()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [runSettings, runningState, resetPlaying])
+  }, [runSettings, runningState, resetRunningState])
 
   return (
     <div className="h-full flex flex-col">

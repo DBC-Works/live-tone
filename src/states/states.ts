@@ -11,5 +11,7 @@ export const runSettings: RunSettings = {
  * Running state
  */
 export const runningState: RunningState = {
+  nowPlaying: false,
+  updated: false,
   registeredPlayings: new Set<Stoppable>([]),
 }

@@ -179,4 +179,74 @@ describe('App component', () => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
     })
   })
+  describe('status', () => {
+    it('should be "Ready" after start', () => {
+      // arrange & act
+      setup()
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Ready')
+    })
+
+    it('should be "Playing" after start playing', async () => {
+      // arrange
+      const { rerender } = setup()
+
+      // act
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+    })
+
+    it('should be "Ready" after stop playing', async () => {
+      // arrange
+      const { rerender } = setup()
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+      // act
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Ready')
+    })
+
+    it('should be "Updated" when code is edited in playing', async () => {
+      const { rerender } = setup()
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+      // act
+      await simulateTypingOfText(';')
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Updated')
+    })
+
+    it('should be "Error" after evaluate invalid type code', async () => {
+      // arrange
+      const { rerender } = setup()
+
+      // act
+      await simulateTypingOfText('invalid code')
+      try {
+        await user.click(screen.getByRole('button', { name: 'Run' }))
+      } catch {
+        //
+      }
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Error')
+    })
+  })
 })

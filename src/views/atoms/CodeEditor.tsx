@@ -1,12 +1,11 @@
-import AceEditor from 'react-ace'
 import { useCallback } from 'react'
-import { useAtom } from 'jotai'
-
-import { liveCodeAtom } from '@/states/atoms'
-
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import AceEditor from 'react-ace'
 import 'ace-builds/src-noconflict/mode-javascript'
 import 'ace-builds/src-noconflict/theme-xcode'
 import 'ace-builds/src-noconflict/ext-language_tools'
+
+import { liveCodeAtom, runningStateAtom, updateAtom } from '@/states/atoms'
 
 type Props = React.ComponentProps<'div'>
 
@@ -17,12 +16,17 @@ type Props = React.ComponentProps<'div'>
  */
 export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
   const [liveCode, setLiveCode] = useAtom(liveCodeAtom)
+  const { updated } = useAtomValue(runningStateAtom)
+  const update = useSetAtom(updateAtom)
 
-  const handleOnChange = useCallback(
+  const handleChange = useCallback(
     (value: string) => {
       setLiveCode(() => value)
+      if (updated === false) {
+        update()
+      }
     },
-    [setLiveCode]
+    [setLiveCode, update, updated]
   )
 
   return (
@@ -39,7 +43,7 @@ export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
       showPrintMargin={false}
       enableBasicAutocompletion={true}
       value={liveCode}
-      onChange={handleOnChange}
+      onChange={handleChange}
     />
   )
 }
