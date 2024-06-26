@@ -1,4 +1,4 @@
-import { RunSettings, Stoppable } from './types'
+import { RunningState, RunSettings, Stoppable } from './types'
 
 /**
  * Run settings
@@ -8,6 +8,10 @@ export const runSettings: RunSettings = {
 }
 
 /**
- * Playing management set
+ * Running state
  */
-export const playingSet = new Set<Stoppable>([])
+export const runningState: RunningState = {
+  nowPlaying: false,
+  updated: false,
+  registeredPlayings: new Set<Stoppable>([]),
+}

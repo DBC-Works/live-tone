@@ -6,7 +6,7 @@ import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
 import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
-import { userEvent } from '@testing-library/user-event'
+import { UserEvent, userEvent } from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
 
 describe('App component', () => {
@@ -14,6 +14,8 @@ describe('App component', () => {
     initialValues: any
     children: JSX.Element
   }
+
+  let user: UserEvent
 
   const HydrateAtoms = ({
     initialValues,
@@ -44,7 +46,14 @@ describe('App component', () => {
   )
 
   const setup = () => {
+    user = userEvent.setup()
     return render(<AppProvider />)
+  }
+
+  const simulateTypingOfText = async (text: string) => {
+    const textbox = screen.getByRole('textbox')
+    textbox.focus()
+    await user.type(textbox, text)
   }
 
   describe('"Run" button', () => {
@@ -61,10 +70,7 @@ describe('App component', () => {
       setup()
 
       // act
-      await userEvent.type(
-        screen.getByRole('textbox'),
-        'Tone.Transport.start()'
-      )
+      await simulateTypingOfText('Tone.Transport.start()')
 
       // assert
       expect(await screen.findByRole('button', { name: 'Run' })).toBeEnabled()
@@ -82,9 +88,9 @@ describe('App component', () => {
       setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), ';')
+      await simulateTypingOfText(';')
       Tone.Transport.start()
-      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
       expect(Tone.Transport.stop).toHaveBeenCalled()
@@ -95,8 +101,8 @@ describe('App component', () => {
       setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), ';')
-      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
       expect(Tone.Transport.stop).not.toHaveBeenCalled()
@@ -107,9 +113,9 @@ describe('App component', () => {
       setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), ';')
+      await simulateTypingOfText(';')
       Tone.Transport.start()
-      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
       expect(Tone.Transport.stop).toHaveBeenCalled()
@@ -121,12 +127,12 @@ describe('App component', () => {
       setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), ';')
-      await userEvent.click(
+      await simulateTypingOfText(';')
+      await user.click(
         screen.getByRole('checkbox', { name: 'cancel `transport` on stop' })
       )
       Tone.Transport.start()
-      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
       expect(Tone.Transport.stop).toHaveBeenCalled()
@@ -148,8 +154,8 @@ describe('App component', () => {
       const { rerender } = setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), ';')
-      await userEvent.click(screen.getByRole('button', { name: 'Run' }))
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
       rerender(<AppProvider />)
 
       // assert
@@ -161,9 +167,9 @@ describe('App component', () => {
       const { rerender } = setup()
 
       // act
-      await userEvent.type(screen.getByRole('textbox'), 'invalid code')
+      await simulateTypingOfText('invalid code')
       try {
-        await userEvent.click(screen.getByRole('button', { name: 'Run' }))
+        await user.click(screen.getByRole('button', { name: 'Run' }))
       } catch {
         //
       }
@@ -171,6 +177,76 @@ describe('App component', () => {
 
       // assert
       expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+  })
+  describe('status', () => {
+    it('should be "Ready" after start', () => {
+      // arrange & act
+      setup()
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Ready')
+    })
+
+    it('should be "Playing" after start playing', async () => {
+      // arrange
+      const { rerender } = setup()
+
+      // act
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+    })
+
+    it('should be "Ready" after stop playing', async () => {
+      // arrange
+      const { rerender } = setup()
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+      // act
+      await user.click(screen.getByRole('button', { name: 'Stop' }))
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Ready')
+    })
+
+    it('should be "Updated" when code is edited in playing', async () => {
+      const { rerender } = setup()
+      await simulateTypingOfText(';')
+      await user.click(screen.getByRole('button', { name: 'Run' }))
+      rerender(<AppProvider />)
+      expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+      // act
+      await simulateTypingOfText(';')
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Updated')
+    })
+
+    it('should be "Error" after evaluate invalid type code', async () => {
+      // arrange
+      const { rerender } = setup()
+
+      // act
+      await simulateTypingOfText('invalid code')
+      try {
+        await user.click(screen.getByRole('button', { name: 'Run' }))
+      } catch {
+        //
+      }
+      rerender(<AppProvider />)
+
+      // assert
+      expect(screen.getByRole('status')).toHaveTextContent('Error')
     })
   })
 })

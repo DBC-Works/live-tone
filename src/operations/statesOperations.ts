@@ -1,19 +1,21 @@
 import { Stoppable } from '@/states/types'
-import { playingSet } from '@/states/states'
+import { runningState } from '@/states/states'
 
 /**
  * Register playing
  * @param playing playing to register
  */
 export const registerPlaying = (playing: Stoppable): void => {
+  const { registeredPlayings } = runningState
+
   if ('onstop' in playing) {
     const stopHandler = playing.onstop
     playing.onstop = (playing: any) => {
       if (stopHandler) {
         stopHandler(playing)
       }
-      playingSet.delete(playing)
+      registeredPlayings.delete(playing)
     }
   }
-  playingSet.add(playing)
+  registeredPlayings.add(playing)
 }

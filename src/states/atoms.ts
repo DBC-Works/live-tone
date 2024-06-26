@@ -1,20 +1,49 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
-import { playingSet, runSettings } from './states'
+import { runningState, runSettings } from './states'
 
 /**
- * Playing management atom
+ * Running state atom
  */
-export const playingAtom = atom(playingSet)
+export const runningStateAtom = atom(runningState)
 
 /**
- * Reset playing write-only atom
+ * Update write-only atom
  */
-export const resetPlayingAtom = atom(null, (_, set) => {
-  set(playingAtom, (playingSet) => {
-    playingSet.clear()
-    return playingSet
+export const updateAtom = atom(null, (_, set) => {
+  set(runningStateAtom, (runningState) => {
+    return {
+      ...runningState,
+      updated: true,
+    }
+  })
+})
+
+/**
+ * Play write-only atom
+ */
+export const playAtom = atom(null, (_, set) => {
+  set(runningStateAtom, (runningState) => {
+    return {
+      ...runningState,
+      nowPlaying: true,
+      updated: false,
+    }
+  })
+})
+
+/**
+ * Reset running state write-only atom
+ */
+export const resetRunningStateAtom = atom(null, (_, set) => {
+  set(runningStateAtom, (runningState) => {
+    runningState.registeredPlayings.clear()
+    return {
+      ...runningState,
+      nowPlaying: false,
+      updated: false,
+    }
   })
 })
 
