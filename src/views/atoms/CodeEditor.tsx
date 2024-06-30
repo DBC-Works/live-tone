@@ -5,7 +5,12 @@ import 'ace-builds/src-noconflict/mode-javascript'
 import 'ace-builds/src-noconflict/theme-xcode'
 import 'ace-builds/src-noconflict/ext-language_tools'
 
-import { liveCodeAtom, runningStateAtom, updateAtom } from '@/states/atoms'
+import {
+  editSettingsAtom,
+  liveCodeAtom,
+  runningStateAtom,
+  updateAtom,
+} from '@/states/atoms'
 
 type Props = React.ComponentProps<'div'>
 
@@ -16,6 +21,7 @@ type Props = React.ComponentProps<'div'>
  */
 export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
   const [liveCode, setLiveCode] = useAtom(liveCodeAtom)
+  const { enableLiveAutoCompletion } = useAtomValue(editSettingsAtom)
   const { updated } = useAtomValue(runningStateAtom)
   const update = useSetAtom(updateAtom)
 
@@ -42,6 +48,7 @@ export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
       wrapEnabled={true}
       showPrintMargin={false}
       enableBasicAutocompletion={true}
+      enableLiveAutocompletion={enableLiveAutoCompletion}
       value={liveCode}
       onChange={handleChange}
     />

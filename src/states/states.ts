@@ -1,4 +1,11 @@
-import { RunningState, RunSettings, Stoppable } from './types'
+import { EditSettings, RunningState, RunSettings, Stoppable } from './types'
+
+/**
+ * Edit settings
+ */
+export const editSettings: EditSettings = {
+  enableLiveAutoCompletion: false,
+}
 
 /**
  * Run settings
