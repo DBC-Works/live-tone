@@ -59,3 +59,13 @@ export type RunSettings = {
    */
   cancelTransportOnStop: boolean
 }
+
+/**
+ * Edit settings
+ */
+export type EditSettings = {
+  /**
+   * Enable live auto completion
+   */
+  enableLiveAutoCompletion: boolean
+}

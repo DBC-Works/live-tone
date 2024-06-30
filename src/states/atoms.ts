@@ -1,7 +1,7 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
-import { runningState, runSettings } from './states'
+import { editSettings, runningState, runSettings } from './states'
 
 /**
  * Running state atom
@@ -72,6 +72,26 @@ export const cancelTransportOnStopRunSettingsAtom = atom(
       return {
         ...runSettings,
         cancelTransportOnStop: !runSettings.cancelTransportOnStop,
+      }
+    })
+  }
+)
+
+/**
+ * Edit settings atom
+ */
+export const editSettingsAtom = atomWithStorage('EditSettings', editSettings)
+
+/**
+ * Enable live auto completion read-write atom
+ */
+export const enableLiveAutoCompletionEditSettingsAtom = atom(
+  (get) => get(editSettingsAtom).enableLiveAutoCompletion,
+  (_, set) => {
+    set(editSettingsAtom, (editSettings) => {
+      return {
+        ...editSettings,
+        enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
       }
     })
   }
