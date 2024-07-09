@@ -7,11 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-07-09
+
+### Added
+
+- Add chord support(#8)
+- Add scale support(#1, #3)
+- Add array and iteration utilities(#1)
+
+### Changed
+
+- Replace the textarea element used for code editing with [React Ace](https://github.com/securingsincity/react-ace)(#10 , #15)
+- Update reference libraries
+
+### Fixed
+
+- Update error handling(#6)
+
 ## [0.1.0] - 2024-02-10
 
 ### Added
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/live-tone/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/DBC-Works/live-tone/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.2.0
 [0.1.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.1.0
