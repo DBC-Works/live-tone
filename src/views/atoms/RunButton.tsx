@@ -23,14 +23,14 @@ export const RunButton: React.FC = (): JSX.Element => {
   const handleClick = useCallback(() => {
     try {
       setEvalError(null)
-      const LiveTone = {
-        registerPlaying,
+      const LiveTone = Object.freeze({
+        registerPlaying: Object.freeze(registerPlaying),
         Scale,
         Ary,
         Itr,
         Nmb,
         Chr,
-      }
+      })
       new Function('Tone', 'LiveTone', `'use strict';${liveCode}`)(
         Tone,
         LiveTone

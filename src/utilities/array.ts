@@ -5,7 +5,7 @@ import { randomNumber } from './number'
  * @param array Source
  * @returns Shuffled
  */
-export const makeShuffled = <T>(array: readonly T[]): readonly T[] => {
+const makeShuffled = <T>(array: readonly T[]): readonly T[] => {
   const source = [...array]
   const shuffled = []
   while (1 < source.length) {
@@ -22,23 +22,22 @@ export const makeShuffled = <T>(array: readonly T[]): readonly T[] => {
  * @param array Source
  * @returns Chose value
  */
-export const choose = <T>(array: readonly T[]): T =>
-  array[randomNumber(array.length)]
+const choose = <T>(array: readonly T[]): T => array[randomNumber(array.length)]
 
 /**
  * Array utilities
  */
-export const Ary = {
-  makeShuffled,
-  choose,
-} as const
+export const Ary = Object.freeze({
+  makeShuffled: Object.freeze(makeShuffled),
+  choose: Object.freeze(choose),
+} as const)
 
 /**
  * Get iterator from first
  * @param array Source
  * @return Iterator
  */
-export function* fromFirst<T>(array: readonly T[]): Generator<T> {
+function* fromFirst<T>(array: readonly T[]): Generator<T> {
   let index = 0
   while (true) {
     if (index === array.length) {
@@ -53,7 +52,7 @@ export function* fromFirst<T>(array: readonly T[]): Generator<T> {
  * @param array Source
  * @return Iterator
  */
-export function* fromLast<T>(array: readonly T[]): Generator<T> {
+function* fromLast<T>(array: readonly T[]): Generator<T> {
   let index = array.length
   while (true) {
     if (index === 0) {
@@ -69,7 +68,7 @@ export function* fromLast<T>(array: readonly T[]): Generator<T> {
  * @param fromFirst From first
  * @return Iterator
  */
-export function* roundTrip<T>(
+function* roundTrip<T>(
   array: readonly T[],
   fromFirst: boolean = true
 ): Generator<T> {
@@ -92,7 +91,7 @@ export function* roundTrip<T>(
  * @param array
  * @returns
  */
-export function* shuffle<T>(array: readonly T[]): Generator<T> {
+function* shuffle<T>(array: readonly T[]): Generator<T> {
   let shuffled = null
   let index = 0
   while (true) {
@@ -109,7 +108,7 @@ export function* shuffle<T>(array: readonly T[]): Generator<T> {
  * @param array Source
  * @return Iterator
  */
-export function* random<T>(array: readonly T[]): Generator<T> {
+function* random<T>(array: readonly T[]): Generator<T> {
   while (true) {
     yield array[randomNumber(array.length)]
   }
@@ -118,10 +117,10 @@ export function* random<T>(array: readonly T[]): Generator<T> {
 /**
  * Iteration utilities
  */
-export const Itr = {
-  fromFirst,
-  fromLast,
-  roundTrip,
-  shuffle,
-  random,
-} as const
+export const Itr = Object.freeze({
+  fromFirst: Object.freeze(fromFirst),
+  fromLast: Object.freeze(fromLast),
+  roundTrip: Object.freeze(roundTrip),
+  shuffle: Object.freeze(shuffle),
+  random: Object.freeze(random),
+} as const)

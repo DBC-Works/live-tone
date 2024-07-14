@@ -1,17 +1,12 @@
-import {
-  chord,
-  chordTypes,
-  harmonicMinorDiatonicChords,
-  majorDiatonicChords,
-  melodicMinorDiatonicChords,
-  naturalMinorDiatonicChords,
-} from './chord'
+import { Chr } from './chord'
 
 describe('Chord', () => {
   describe('chordTypes', () => {
     it('should return chord types', () => {
-      const types = chordTypes()
-      expect(types.every((type) => 0 < chord('C3', type).length)).toEqual(true)
+      const types = Chr.chordTypes()
+      expect(types.every((type) => 0 < Chr.chord('C3', type).length)).toEqual(
+        true
+      )
     })
   })
 
@@ -140,14 +135,14 @@ describe('Chord', () => {
     ])(
       'should return notes %s if chord type is "%s" and root is "%s"',
       (expected: string, chordType: string, root: string) => {
-        expect(chord(root, chordType).join(',')).toEqual(expected)
+        expect(Chr.chord(root, chordType).join(',')).toEqual(expected)
       }
     )
   })
 
   describe('majorDiatonicChord', () => {
     it('should return major diatonic chords of specified key', () => {
-      expect(majorDiatonicChords('C4')).toEqual([
+      expect(Chr.majorDiatonicChords('C4')).toEqual([
         ['C4', 'E4', 'G4', 'B4'],
         ['D4', 'F4', 'A4', 'C5'],
         ['E4', 'G4', 'B4', 'D5'],
@@ -161,7 +156,7 @@ describe('Chord', () => {
 
   describe('naturalMinorDiatonicChord', () => {
     it('should return natural minor diatonic chords of specified key', () => {
-      expect(naturalMinorDiatonicChords('A3')).toEqual([
+      expect(Chr.naturalMinorDiatonicChords('A3')).toEqual([
         ['A3', 'C4', 'E4', 'G4'],
         ['B3', 'D4', 'F4', 'A4'],
         ['C4', 'E4', 'G4', 'B4'],
@@ -175,7 +170,7 @@ describe('Chord', () => {
 
   describe('harmonicMinorDiatonicChord', () => {
     it('should return harmonic minor diatonic chords of specified key', () => {
-      expect(harmonicMinorDiatonicChords('A3')).toEqual([
+      expect(Chr.harmonicMinorDiatonicChords('A3')).toEqual([
         ['A3', 'C4', 'E4', 'G#4'],
         ['B3', 'D4', 'F4', 'A4'],
         ['C4', 'E4', 'G#4', 'B4'],
@@ -189,7 +184,7 @@ describe('Chord', () => {
 
   describe('melodicMinorDiatonicChord', () => {
     it('should return melodic minor diatonic chords of specified key', () => {
-      expect(melodicMinorDiatonicChords('A3')).toEqual([
+      expect(Chr.melodicMinorDiatonicChords('A3')).toEqual([
         ['A3', 'C4', 'E4', 'G#4'],
         ['B3', 'D4', 'F#4', 'A4'],
         ['C4', 'E4', 'G#4', 'B4'],

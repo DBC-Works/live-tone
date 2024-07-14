@@ -81,7 +81,7 @@ const ChordTypeAlias = {
  * Get chord types
  * @returns Chord types
  */
-export const chordTypes = () => Object.keys(ChordStructure)
+const chordTypes = () => Object.keys(ChordStructure)
 
 /**
  * Get notes of specified chord
@@ -207,7 +207,7 @@ const deconstructNote = (
  */
 const diatonicChords = (
   types: readonly string[],
-  scale: ScaleInfo,
+  scale: Readonly<ScaleInfo>,
   noteName: string,
   octave: number
 ) => {
@@ -218,11 +218,11 @@ const diatonicChords = (
 /**
  * Chord utilities
  */
-export const Chr = {
-  chordTypes,
-  chord,
-  harmonicMinorDiatonicChords,
-  melodicMinorDiatonicChords,
-  majorDiatonicChords,
-  naturalMinorDiatonicChords,
-} as const
+export const Chr = Object.freeze({
+  chordTypes: Object.freeze(chordTypes),
+  chord: Object.freeze(chord),
+  harmonicMinorDiatonicChords: Object.freeze(harmonicMinorDiatonicChords),
+  melodicMinorDiatonicChords: Object.freeze(melodicMinorDiatonicChords),
+  majorDiatonicChords: Object.freeze(majorDiatonicChords),
+  naturalMinorDiatonicChords: Object.freeze(naturalMinorDiatonicChords),
+} as const)
