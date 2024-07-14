@@ -29,8 +29,8 @@ export class ScaleInfo {
   static newInstance(
     name: string,
     pickUpIndexes: readonly number[] | null
-  ): ScaleInfo {
-    return new ScaleInfo(name, pickUpIndexes)
+  ): Readonly<ScaleInfo> {
+    return Object.freeze(new ScaleInfo(name, pickUpIndexes))
   }
 
   /* eslint-disable no-unused-vars */
@@ -52,8 +52,8 @@ export class ScaleInfo {
    */
   private scaleNotes(chromaticNotes: readonly string[]): readonly string[] {
     return this.pickUpIndexes !== null
-      ? chromaticNotes.filter(
-          (_, index) => this.pickUpIndexes?.some((n) => n === index % 12)
+      ? chromaticNotes.filter((_, index) =>
+          this.pickUpIndexes?.some((n) => n === index % 12)
         )
       : [...chromaticNotes]
   }
@@ -120,45 +120,45 @@ const NaturalMinorScaleIndexes = [0, 2, 3, 5, 7, 8, 10, 12] as const
 /**
  * Scale
  */
-export const Scale: {
-  Chromatic: ScaleInfo
+export const Scale: Readonly<{
+  Chromatic: Readonly<ScaleInfo>
 
-  Major: ScaleInfo
-  NaturalMinor: ScaleInfo
-  HarmonicMinor: ScaleInfo
-  MelodicMinorUp: ScaleInfo
+  Major: Readonly<ScaleInfo>
+  NaturalMinor: Readonly<ScaleInfo>
+  HarmonicMinor: Readonly<ScaleInfo>
+  MelodicMinorUp: Readonly<ScaleInfo>
 
-  Ionian: ScaleInfo
-  Dorian: ScaleInfo
-  Phrygian: ScaleInfo
-  Lydian: ScaleInfo
-  Mixolydian: ScaleInfo
-  Aeorian: ScaleInfo
-  Locrian: ScaleInfo
-  MajorBlues: ScaleInfo
-  MinorBlues: ScaleInfo
-  Diminish: ScaleInfo
-  CombinationDiminish: ScaleInfo
-  MajorPentatonic: ScaleInfo
-  MinorPentatonic: ScaleInfo
-  RagaBhairav: ScaleInfo
-  RagaGamanasrama: ScaleInfo
-  RagaTodi: ScaleInfo
-  SpanishScale: ScaleInfo
-  GypsyScale: ScaleInfo
-  ArabianScale: ScaleInfo
-  EgyptianScale: ScaleInfo
-  HawaiianScale: ScaleInfo
-  BaliIslandPelog: ScaleInfo
-  JapaneseMiyakobushi: ScaleInfo
-  RyukyuScale: ScaleInfo
-  Wholetone: ScaleInfo
-  MinorThirdInterval: ScaleInfo
-  ThirdInterval: ScaleInfo
-  FourthInterval: ScaleInfo
-  FifthInterval: ScaleInfo
-  OctaveInterval: ScaleInfo
-} = {
+  Ionian: Readonly<ScaleInfo>
+  Dorian: Readonly<ScaleInfo>
+  Phrygian: Readonly<ScaleInfo>
+  Lydian: Readonly<ScaleInfo>
+  Mixolydian: Readonly<ScaleInfo>
+  Aeorian: Readonly<ScaleInfo>
+  Locrian: Readonly<ScaleInfo>
+  MajorBlues: Readonly<ScaleInfo>
+  MinorBlues: Readonly<ScaleInfo>
+  Diminish: Readonly<ScaleInfo>
+  CombinationDiminish: Readonly<ScaleInfo>
+  MajorPentatonic: Readonly<ScaleInfo>
+  MinorPentatonic: Readonly<ScaleInfo>
+  RagaBhairav: Readonly<ScaleInfo>
+  RagaGamanasrama: Readonly<ScaleInfo>
+  RagaTodi: Readonly<ScaleInfo>
+  SpanishScale: Readonly<ScaleInfo>
+  GypsyScale: Readonly<ScaleInfo>
+  ArabianScale: Readonly<ScaleInfo>
+  EgyptianScale: Readonly<ScaleInfo>
+  HawaiianScale: Readonly<ScaleInfo>
+  BaliIslandPelog: Readonly<ScaleInfo>
+  JapaneseMiyakobushi: Readonly<ScaleInfo>
+  RyukyuScale: Readonly<ScaleInfo>
+  Wholetone: Readonly<ScaleInfo>
+  MinorThirdInterval: Readonly<ScaleInfo>
+  ThirdInterval: Readonly<ScaleInfo>
+  FourthInterval: Readonly<ScaleInfo>
+  FifthInterval: Readonly<ScaleInfo>
+  OctaveInterval: Readonly<ScaleInfo>
+}> = Object.freeze({
   Chromatic: ScaleInfo.newInstance('Chromatic', null),
 
   Major: ScaleInfo.newInstance('Major', MajorScaleIndexes),
@@ -235,4 +235,4 @@ export const Scale: {
   FourthInterval: ScaleInfo.newInstance('4th Interval', [0, 5, 10, 12]),
   FifthInterval: ScaleInfo.newInstance('5th Interval', [0, 7, 12]),
   OctaveInterval: ScaleInfo.newInstance('Octave Interval', [0, 12]),
-} as const
+} as const)

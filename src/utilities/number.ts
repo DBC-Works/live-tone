@@ -11,7 +11,7 @@ export const randomNumber = (n: number): number => Math.floor(Math.random() * n)
  * @param end End(not include)
  * @returns Random number
  */
-export const randomInRange = (begin: number, end: number): number =>
+const randomInRange = (begin: number, end: number): number =>
   begin + randomNumber(end - begin)
 
 /**
@@ -19,13 +19,13 @@ export const randomInRange = (begin: number, end: number): number =>
  * @param n Denominator
  * @returns Result
  */
-export const oneIn = (n: number): boolean => randomNumber(n) === 0
+const oneIn = (n: number): boolean => randomNumber(n) === 0
 
 /**
  * Number utilities
  */
-export const Nmb = {
+export const Nmb = Object.freeze({
   randomNumber,
   randomInRange,
   oneIn,
-} as const
+} as const)
