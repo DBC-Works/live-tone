@@ -1,7 +1,7 @@
 import { Scale, ScaleInfo } from './scale'
 
 describe('Scale', () => {
-  let scales: ScaleInfo[]
+  let scales: Readonly<ScaleInfo>[]
   beforeAll(() => {
     scales = Object.entries(Scale).map(([, scale]) => scale)
   })
@@ -46,7 +46,7 @@ describe('Scale', () => {
     ['C,C', 'Octave Interval', Scale.OctaveInterval],
   ])(
     'should return notes "%s" if scale is %s',
-    (notes: string, scaleName: string, scale: ScaleInfo) => {
+    (notes: string, scaleName: string, scale: Readonly<ScaleInfo>) => {
       expect(scale.name).toEqual(scaleName)
       expect(scale.rawNotes.join()).toEqual(notes)
     }
