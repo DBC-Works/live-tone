@@ -70,7 +70,7 @@ describe('App component', () => {
       setup()
 
       // act
-      await simulateTypingOfText('Tone.Transport.start()')
+      await simulateTypingOfText('Tone.getTransport().start()')
 
       // assert
       expect(await screen.findByRole('button', { name: 'Run' })).toBeEnabled()
@@ -79,24 +79,24 @@ describe('App component', () => {
 
   describe('"Stop" button', () => {
     afterEach(() => {
-      Tone.Transport.stop()
+      Tone.getTransport().stop()
       vi.restoreAllMocks()
     })
 
-    it('should call `Tone.Transport.stop()` method on click during playing', async () => {
+    it('should call `Tone.getTransport().stop()` method on click during playing', async () => {
       // arrange
       setup()
 
       // act
       await simulateTypingOfText(';')
-      Tone.Transport.start()
+      Tone.getTransport().start()
       await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
-      expect(Tone.Transport.stop).toHaveBeenCalled()
+      expect(Tone.getTransport().stop).toHaveBeenCalled()
     })
 
-    it('should not call `Tone.Transport.stop()` method on click during stopped', async () => {
+    it('should not call `Tone.getTransport().stop()` method on click during stopped', async () => {
       // arrange
       setup()
 
@@ -105,24 +105,24 @@ describe('App component', () => {
       await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
-      expect(Tone.Transport.stop).not.toHaveBeenCalled()
+      expect(Tone.getTransport().stop).not.toHaveBeenCalled()
     })
 
-    it('should call `Tone.Transport.cancel()` method on click if specified', async () => {
+    it('should call `Tone.getTransport().cancel()` method on click if specified', async () => {
       // arrange
       setup()
 
       // act
       await simulateTypingOfText(';')
-      Tone.Transport.start()
+      Tone.getTransport().start()
       await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
-      expect(Tone.Transport.stop).toHaveBeenCalled()
-      expect(Tone.Transport.cancel).toHaveBeenCalled()
+      expect(Tone.getTransport().stop).toHaveBeenCalled()
+      expect(Tone.getTransport().cancel).toHaveBeenCalled()
     })
 
-    it('should not call `Transport.cancel()` method on click if not specified', async () => {
+    it('should not call `getTransport().cancel()` method on click if not specified', async () => {
       // arrange
       setup()
 
@@ -131,17 +131,17 @@ describe('App component', () => {
       await user.click(
         screen.getByRole('checkbox', { name: 'cancel `transport` on stop' })
       )
-      Tone.Transport.start()
+      Tone.getTransport().start()
       await user.click(screen.getByRole('button', { name: 'Stop' }))
 
       // assert
-      expect(Tone.Transport.stop).toHaveBeenCalled()
-      expect(Tone.Transport.cancel).not.toHaveBeenCalled()
+      expect(Tone.getTransport().stop).toHaveBeenCalled()
+      expect(Tone.getTransport().cancel).not.toHaveBeenCalled()
     })
   })
 
   describe('Error alert', () => {
-    it('should visible before evaluate type code', () => {
+    it('should not visible before evaluate type code', () => {
       // arrange & act
       setup()
 
