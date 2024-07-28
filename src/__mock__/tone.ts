@@ -1,6 +1,6 @@
 let state = 'stopped'
 
-export const Transport = {
+const transportMock = {
   get state() {
     return state
   },
@@ -12,3 +12,6 @@ export const Transport = {
   }),
   cancel: vi.fn(),
 }
+
+export const Transport = transportMock
+export const getTransport = () => transportMock

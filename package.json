@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "ace-builds": "^1.35.0",
+    "ast-types": "^0.14.2",
+    "esprima": "^4.0.1",
     "jotai": "^2.6.1",
     "react": "^18.2.0",
     "react-ace": "^12.0.0",
@@ -24,6 +26,7 @@
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/eslint": "^8.56.10",
+    "@types/esprima": "^4.0.6",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
