@@ -7,7 +7,7 @@ import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
-import { render, screen } from '@testing-library/react'
+import { getByRole, render, screen } from '@testing-library/react'
 
 describe('App component', () => {
   type JotaiPropsType = {
@@ -55,6 +55,93 @@ describe('App component', () => {
     textbox.focus()
     await user.type(textbox, text)
   }
+
+  describe('Code section header', () => {
+    describe('tab list', () => {
+      it('should display tab list for selecting code', () => {
+        // arrange & act
+        setup()
+
+        // assert
+        const tablist = screen.getByRole('tablist')
+        expect(tablist).toBeInTheDocument()
+        expect(
+          getByRole(tablist, 'tab', { name: 'Your code', selected: true })
+        ).toBeInTheDocument()
+      })
+    })
+
+    describe('status indicator', () => {
+      it('should be "Ready" after start', () => {
+        // arrange & act
+        setup()
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent('Ready')
+      })
+
+      it('should be "Playing" after start playing', async () => {
+        // arrange
+        const { rerender } = setup()
+
+        // act
+        await simulateTypingOfText(';')
+        await user.click(screen.getByRole('button', { name: 'Run' }))
+        rerender(<AppProvider />)
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent('Playing')
+      })
+
+      it('should be "Ready" after stop playing', async () => {
+        // arrange
+        const { rerender } = setup()
+        await simulateTypingOfText(';')
+        await user.click(screen.getByRole('button', { name: 'Run' }))
+        rerender(<AppProvider />)
+        expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Stop' }))
+        rerender(<AppProvider />)
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent('Ready')
+      })
+
+      it('should be "Updated" when code is edited in playing', async () => {
+        const { rerender } = setup()
+        await simulateTypingOfText(';')
+        await user.click(screen.getByRole('button', { name: 'Run' }))
+        rerender(<AppProvider />)
+        expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+        // act
+        await simulateTypingOfText(';')
+        rerender(<AppProvider />)
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent('Updated')
+      })
+
+      it('should be "Error" after evaluate invalid type code', async () => {
+        // arrange
+        const { rerender } = setup()
+
+        // act
+        await simulateTypingOfText('invalid code')
+        try {
+          await user.click(screen.getByRole('button', { name: 'Run' }))
+        } catch {
+          //
+        }
+        rerender(<AppProvider />)
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent('Error')
+      })
+    })
+  })
 
   describe('"Run" button', () => {
     it('should disable if code is empty', () => {
@@ -177,76 +264,6 @@ describe('App component', () => {
 
       // assert
       expect(screen.getByRole('alert')).toBeInTheDocument()
-    })
-  })
-  describe('status', () => {
-    it('should be "Ready" after start', () => {
-      // arrange & act
-      setup()
-
-      // assert
-      expect(screen.getByRole('status')).toHaveTextContent('Ready')
-    })
-
-    it('should be "Playing" after start playing', async () => {
-      // arrange
-      const { rerender } = setup()
-
-      // act
-      await simulateTypingOfText(';')
-      await user.click(screen.getByRole('button', { name: 'Run' }))
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.getByRole('status')).toHaveTextContent('Playing')
-    })
-
-    it('should be "Ready" after stop playing', async () => {
-      // arrange
-      const { rerender } = setup()
-      await simulateTypingOfText(';')
-      await user.click(screen.getByRole('button', { name: 'Run' }))
-      rerender(<AppProvider />)
-      expect(screen.getByRole('status')).toHaveTextContent('Playing')
-
-      // act
-      await user.click(screen.getByRole('button', { name: 'Stop' }))
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.getByRole('status')).toHaveTextContent('Ready')
-    })
-
-    it('should be "Updated" when code is edited in playing', async () => {
-      const { rerender } = setup()
-      await simulateTypingOfText(';')
-      await user.click(screen.getByRole('button', { name: 'Run' }))
-      rerender(<AppProvider />)
-      expect(screen.getByRole('status')).toHaveTextContent('Playing')
-
-      // act
-      await simulateTypingOfText(';')
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.getByRole('status')).toHaveTextContent('Updated')
-    })
-
-    it('should be "Error" after evaluate invalid type code', async () => {
-      // arrange
-      const { rerender } = setup()
-
-      // act
-      await simulateTypingOfText('invalid code')
-      try {
-        await user.click(screen.getByRole('button', { name: 'Run' }))
-      } catch {
-        //
-      }
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.getByRole('status')).toHaveTextContent('Error')
     })
   })
 })
