@@ -56,31 +56,104 @@ describe('App component', () => {
     await user.type(textbox, text)
   }
 
-  describe('Code section header', () => {
-    describe('tab list', () => {
-      it('should display tab list for selecting code', () => {
-        // arrange & act
-        setup()
+  describe('Code section', () => {
+    describe('Code section header', () => {
+      describe('tab list', () => {
+        it('should display tab list for selecting code', () => {
+          // arrange & act
+          setup()
 
-        // assert
-        const tablist = screen.getByRole('tablist')
-        expect(tablist).toBeInTheDocument()
-        expect(
-          getByRole(tablist, 'tab', { name: 'Your code', selected: true })
-        ).toBeInTheDocument()
+          // assert
+          const tablist = screen.getByRole('tablist')
+          expect(tablist).toBeInTheDocument()
+          expect(
+            getByRole(tablist, 'tab', { name: 'Your code', selected: true })
+          ).toBeInTheDocument()
+        })
+      })
+
+      describe('status indicator', () => {
+        it('should be "Ready" after start', () => {
+          // arrange & act
+          setup()
+
+          // assert
+          expect(screen.getByRole('status')).toHaveTextContent('Ready')
+        })
+
+        it('should be "Playing" after start playing', async () => {
+          // arrange
+          const { rerender } = setup()
+
+          // act
+          await simulateTypingOfText(';')
+          await user.click(screen.getByRole('button', { name: 'Run' }))
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getByRole('status')).toHaveTextContent('Playing')
+        })
+
+        it('should be "Ready" after stop playing', async () => {
+          // arrange
+          const { rerender } = setup()
+          await simulateTypingOfText(';')
+          await user.click(screen.getByRole('button', { name: 'Run' }))
+          rerender(<AppProvider />)
+          expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+          // act
+          await user.click(screen.getByRole('button', { name: 'Stop' }))
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getByRole('status')).toHaveTextContent('Ready')
+        })
+
+        it('should be "Updated" when code is edited in playing', async () => {
+          const { rerender } = setup()
+          await simulateTypingOfText(';')
+          await user.click(screen.getByRole('button', { name: 'Run' }))
+          rerender(<AppProvider />)
+          expect(screen.getByRole('status')).toHaveTextContent('Playing')
+
+          // act
+          await simulateTypingOfText(';')
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getByRole('status')).toHaveTextContent('Updated')
+        })
+
+        it('should be "Error" after evaluate invalid type code', async () => {
+          // arrange
+          const { rerender } = setup()
+
+          // act
+          await simulateTypingOfText('invalid code')
+          try {
+            await user.click(screen.getByRole('button', { name: 'Run' }))
+          } catch {
+            //
+          }
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getByRole('status')).toHaveTextContent('Error')
+        })
       })
     })
 
-    describe('status indicator', () => {
-      it('should be "Ready" after start', () => {
+    describe('Error alert', () => {
+      it('should not visible before evaluate type code', () => {
         // arrange & act
         setup()
 
         // assert
-        expect(screen.getByRole('status')).toHaveTextContent('Ready')
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
       })
 
-      it('should be "Playing" after start playing', async () => {
+      it('should not visible after evaluate valid type code', async () => {
         // arrange
         const { rerender } = setup()
 
@@ -90,41 +163,10 @@ describe('App component', () => {
         rerender(<AppProvider />)
 
         // assert
-        expect(screen.getByRole('status')).toHaveTextContent('Playing')
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
       })
 
-      it('should be "Ready" after stop playing', async () => {
-        // arrange
-        const { rerender } = setup()
-        await simulateTypingOfText(';')
-        await user.click(screen.getByRole('button', { name: 'Run' }))
-        rerender(<AppProvider />)
-        expect(screen.getByRole('status')).toHaveTextContent('Playing')
-
-        // act
-        await user.click(screen.getByRole('button', { name: 'Stop' }))
-        rerender(<AppProvider />)
-
-        // assert
-        expect(screen.getByRole('status')).toHaveTextContent('Ready')
-      })
-
-      it('should be "Updated" when code is edited in playing', async () => {
-        const { rerender } = setup()
-        await simulateTypingOfText(';')
-        await user.click(screen.getByRole('button', { name: 'Run' }))
-        rerender(<AppProvider />)
-        expect(screen.getByRole('status')).toHaveTextContent('Playing')
-
-        // act
-        await simulateTypingOfText(';')
-        rerender(<AppProvider />)
-
-        // assert
-        expect(screen.getByRole('status')).toHaveTextContent('Updated')
-      })
-
-      it('should be "Error" after evaluate invalid type code', async () => {
+      it('should visible after evaluate invalid type code', async () => {
         // arrange
         const { rerender } = setup()
 
@@ -138,132 +180,92 @@ describe('App component', () => {
         rerender(<AppProvider />)
 
         // assert
-        expect(screen.getByRole('status')).toHaveTextContent('Error')
+        expect(screen.getByRole('alert')).toBeInTheDocument()
       })
     })
-  })
 
-  describe('"Run" button', () => {
-    it('should disable if code is empty', () => {
-      // arrange & act
-      setup()
+    describe('"Run" button', () => {
+      it('should disable if code is empty', () => {
+        // arrange & act
+        setup()
 
-      // assert
-      expect(screen.getByRole('button', { name: 'Run' })).toBeDisabled()
+        // assert
+        expect(screen.getByRole('button', { name: 'Run' })).toBeDisabled()
+      })
+
+      it('should enable if code is not empty', async () => {
+        // arrange
+        setup()
+
+        // act
+        await simulateTypingOfText('Tone.getTransport().start()')
+
+        // assert
+        expect(await screen.findByRole('button', { name: 'Run' })).toBeEnabled()
+      })
     })
 
-    it('should enable if code is not empty', async () => {
-      // arrange
-      setup()
+    describe('"Stop" button', () => {
+      afterEach(() => {
+        Tone.getTransport().stop()
+        vi.restoreAllMocks()
+      })
 
-      // act
-      await simulateTypingOfText('Tone.getTransport().start()')
+      it('should call `Tone.getTransport().stop()` method on click during playing', async () => {
+        // arrange
+        setup()
 
-      // assert
-      expect(await screen.findByRole('button', { name: 'Run' })).toBeEnabled()
-    })
-  })
+        // act
+        await simulateTypingOfText(';')
+        Tone.getTransport().start()
+        await user.click(screen.getByRole('button', { name: 'Stop' }))
 
-  describe('"Stop" button', () => {
-    afterEach(() => {
-      Tone.getTransport().stop()
-      vi.restoreAllMocks()
-    })
+        // assert
+        expect(Tone.getTransport().stop).toHaveBeenCalled()
+      })
 
-    it('should call `Tone.getTransport().stop()` method on click during playing', async () => {
-      // arrange
-      setup()
+      it('should not call `Tone.getTransport().stop()` method on click during stopped', async () => {
+        // arrange
+        setup()
 
-      // act
-      await simulateTypingOfText(';')
-      Tone.getTransport().start()
-      await user.click(screen.getByRole('button', { name: 'Stop' }))
+        // act
+        await simulateTypingOfText(';')
+        await user.click(screen.getByRole('button', { name: 'Stop' }))
 
-      // assert
-      expect(Tone.getTransport().stop).toHaveBeenCalled()
-    })
+        // assert
+        expect(Tone.getTransport().stop).not.toHaveBeenCalled()
+      })
 
-    it('should not call `Tone.getTransport().stop()` method on click during stopped', async () => {
-      // arrange
-      setup()
+      it('should call `Tone.getTransport().cancel()` method on click if specified', async () => {
+        // arrange
+        setup()
 
-      // act
-      await simulateTypingOfText(';')
-      await user.click(screen.getByRole('button', { name: 'Stop' }))
+        // act
+        await simulateTypingOfText(';')
+        Tone.getTransport().start()
+        await user.click(screen.getByRole('button', { name: 'Stop' }))
 
-      // assert
-      expect(Tone.getTransport().stop).not.toHaveBeenCalled()
-    })
+        // assert
+        expect(Tone.getTransport().stop).toHaveBeenCalled()
+        expect(Tone.getTransport().cancel).toHaveBeenCalled()
+      })
 
-    it('should call `Tone.getTransport().cancel()` method on click if specified', async () => {
-      // arrange
-      setup()
+      it('should not call `getTransport().cancel()` method on click if not specified', async () => {
+        // arrange
+        setup()
 
-      // act
-      await simulateTypingOfText(';')
-      Tone.getTransport().start()
-      await user.click(screen.getByRole('button', { name: 'Stop' }))
+        // act
+        await simulateTypingOfText(';')
+        await user.click(
+          screen.getByRole('checkbox', { name: 'cancel `transport` on stop' })
+        )
+        Tone.getTransport().start()
+        await user.click(screen.getByRole('button', { name: 'Stop' }))
 
-      // assert
-      expect(Tone.getTransport().stop).toHaveBeenCalled()
-      expect(Tone.getTransport().cancel).toHaveBeenCalled()
-    })
-
-    it('should not call `getTransport().cancel()` method on click if not specified', async () => {
-      // arrange
-      setup()
-
-      // act
-      await simulateTypingOfText(';')
-      await user.click(
-        screen.getByRole('checkbox', { name: 'cancel `transport` on stop' })
-      )
-      Tone.getTransport().start()
-      await user.click(screen.getByRole('button', { name: 'Stop' }))
-
-      // assert
-      expect(Tone.getTransport().stop).toHaveBeenCalled()
-      expect(Tone.getTransport().cancel).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('Error alert', () => {
-    it('should not visible before evaluate type code', () => {
-      // arrange & act
-      setup()
-
-      // assert
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    })
-
-    it('should not visible after evaluate valid type code', async () => {
-      // arrange
-      const { rerender } = setup()
-
-      // act
-      await simulateTypingOfText(';')
-      await user.click(screen.getByRole('button', { name: 'Run' }))
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    })
-
-    it('should visible after evaluate invalid type code', async () => {
-      // arrange
-      const { rerender } = setup()
-
-      // act
-      await simulateTypingOfText('invalid code')
-      try {
-        await user.click(screen.getByRole('button', { name: 'Run' }))
-      } catch {
-        //
-      }
-      rerender(<AppProvider />)
-
-      // assert
-      expect(screen.getByRole('alert')).toBeInTheDocument()
+        // assert
+        expect(Tone.getTransport().stop).toHaveBeenCalled()
+        expect(Tone.getTransport().cancel).not.toHaveBeenCalled()
+      })
     })
   })
 })
