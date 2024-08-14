@@ -55,7 +55,7 @@ export const CodeEditorSection: React.FC<Props> = ({
 
   return (
     <section className={`${className} flex flex-col`}>
-      <CodeEditorSectionHeader controls="id" />
+      <CodeEditorSectionHeader controls="code" />
       <div className={classNames.join(' ')}>
         <CodeEditor id="code" />
       </div>
