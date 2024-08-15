@@ -42,7 +42,9 @@ export const CodeEditorSectionHeader: React.FC<Props> = ({
           aria-selected="true"
           className="tab tab-active"
         >
-          <h2 className="text-base">Your code</h2>
+          <h2 className="text-base">
+            <label htmlFor={controls}>Your code</label>
+          </h2>
         </a>
       </div>
       <div

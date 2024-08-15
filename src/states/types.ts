@@ -69,3 +69,18 @@ export type EditSettings = {
    */
   enableLiveAutoCompletion: boolean
 }
+
+/**
+ * Sharing settings
+ */
+export type SharingSettings = {
+  /**
+   * Web socket server url
+   */
+  webSocketServerUrl: string
+
+  /**
+   * Tag of code
+   */
+  tagOfCode: string
+}

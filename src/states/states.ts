@@ -1,4 +1,10 @@
-import { EditSettings, RunningState, RunSettings, Stoppable } from './types'
+import {
+  EditSettings,
+  RunningState,
+  RunSettings,
+  SharingSettings,
+  Stoppable,
+} from './types'
 
 /**
  * Edit settings
@@ -12,6 +18,14 @@ export const editSettings: EditSettings = {
  */
 export const runSettings: RunSettings = {
   cancelTransportOnStop: true,
+}
+
+/**
+ * Sharing settings
+ */
+export const sharingSettings: SharingSettings = {
+  webSocketServerUrl: '',
+  tagOfCode: '',
 }
 
 /**
