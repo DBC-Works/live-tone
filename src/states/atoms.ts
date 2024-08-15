@@ -1,7 +1,12 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
-import { editSettings, runningState, runSettings } from './states'
+import {
+  editSettings,
+  runningState,
+  runSettings,
+  sharingSettings,
+} from './states'
 
 /**
  * Running state atom
@@ -92,6 +97,41 @@ export const enableLiveAutoCompletionEditSettingsAtom = atom(
       return {
         ...editSettings,
         enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
+      }
+    })
+  }
+)
+
+/**
+ * Sharing settings atom
+ */
+export const sharingSettingsAtom = atom(sharingSettings)
+
+/**
+ * WebSocket server url read-write atom
+ */
+export const webSocketServerUrlAtom = atom(
+  (get) => get(sharingSettingsAtom).webSocketServerUrl,
+  (_, set, value: string) => {
+    set(sharingSettingsAtom, (sharingSettings) => {
+      return {
+        ...sharingSettings,
+        webSocketServerUrl: value,
+      }
+    })
+  }
+)
+
+/**
+ * Tag of code read-write atom
+ */
+export const tagOfCodeAtom = atom(
+  (get) => get(sharingSettingsAtom).tagOfCode,
+  (_, set, value: string) => {
+    set(sharingSettingsAtom, (sharingSettings) => {
+      return {
+        ...sharingSettings,
+        tagOfCode: value,
       }
     })
   }
