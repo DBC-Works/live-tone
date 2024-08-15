@@ -51,7 +51,11 @@ describe('App component', () => {
   }
 
   const simulateTypingOfText = async (text: string) => {
-    const textbox = screen.getByRole('textbox')
+    const codeSectionHeader = screen.getByRole('heading', {
+      level: 2,
+      name: 'Your code',
+    })
+    const textbox = getByRole(codeSectionHeader.closest('section')!, 'textbox')
     textbox.focus()
     await user.type(textbox, text)
   }
@@ -266,6 +270,37 @@ describe('App component', () => {
         expect(Tone.getTransport().stop).toHaveBeenCalled()
         expect(Tone.getTransport().cancel).not.toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('Settings section', () => {
+    it('should the heading "Sharing settings"', () => {
+      // arrange & act
+      setup()
+
+      // assert
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Sharing settings',
+        })
+      )
+    })
+
+    it('should exists "Azure Web PubSub client access URL" input text field', () => {
+      // arrange & act
+      setup()
+
+      // assert
+      expect(screen.getByLabelText('Azure Web PubSub client access URL'))
+    })
+
+    it('should exist "Tag of your code" input text field', () => {
+      // arrange & act
+      setup()
+
+      // assert
+      expect(screen.getByLabelText('Tag of your code'))
     })
   })
 })
