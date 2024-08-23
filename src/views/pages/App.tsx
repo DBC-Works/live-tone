@@ -9,7 +9,7 @@ import {
 import { stopPlaying } from '@/operations/toneOperations'
 import { AppHeader } from '@/views/organisms/AppHeader'
 import { CodeEditorSection } from '@/views/organisms/CodeEditorSection'
-import { ToolSection } from '@/views/organisms/ToolSection'
+import { PlaySection } from '@/views/organisms/PlaySection'
 import { SettingsSection } from '@/views/organisms/SettingsSection'
 
 /**
@@ -39,7 +39,7 @@ export const App: React.FC = (): JSX.Element => {
         <main className="grow h-full flex flex-col md:flex-row">
           <div className="grow flex flex-col">
             <CodeEditorSection className="grow mb-4" />
-            <ToolSection />
+            <PlaySection />
           </div>
         </main>
         <aside className="md:ml-4">

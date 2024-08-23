@@ -187,7 +187,9 @@ describe('App component', () => {
         expect(screen.getByRole('alert')).toBeInTheDocument()
       })
     })
+  })
 
+  describe('Play section', () => {
     describe('"Run" button', () => {
       it('should disable if code is empty', () => {
         // arrange & act
