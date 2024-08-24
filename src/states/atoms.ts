@@ -3,6 +3,7 @@ import { atomWithStorage } from 'jotai/utils'
 
 import {
   editSettings,
+  errorInfo,
   runningState,
   runSettings,
   sharingSettings,
@@ -58,9 +59,9 @@ export const resetRunningStateAtom = atom(null, (_, set) => {
 export const liveCodeAtom = atomWithStorage('liveCode', '')
 
 /**
- * Error atom
+ * Error information atom
  */
-export const errorAtom = atom<Error | null>(null)
+export const errorAtom = atom(errorInfo)
 
 /**
  * Run settings atom

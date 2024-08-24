@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai'
 
-import { CodeState } from '@/states/types'
+import { CodeState, ErrorTypes } from '@/states/types'
 import { errorAtom, runningStateAtom } from '@/states/atoms'
 
 /**
@@ -9,9 +9,9 @@ import { errorAtom, runningStateAtom } from '@/states/atoms'
  */
 export const useCodeState = (): CodeState => {
   const { nowPlaying, updated } = useAtomValue(runningStateAtom)
-  const error = useAtomValue(errorAtom)
+  const { error, type } = useAtomValue(errorAtom)
 
-  if (error !== null) {
+  if (error !== null && type === ErrorTypes.Eval) {
     return CodeState.Error
   }
   if (nowPlaying === false) {

@@ -7,7 +7,7 @@ import { errorAtom } from '@/states/atoms'
  * @returns rendering result
  */
 export const ErrorReporter: React.FC = (): JSX.Element | null => {
-  const error = useAtomValue(errorAtom)
+  const { error } = useAtomValue(errorAtom)
   if (error === null) {
     return null
   }

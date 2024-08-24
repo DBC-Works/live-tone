@@ -1,10 +1,20 @@
 import {
   EditSettings,
+  ErrorInfo,
+  ErrorTypes,
   RunningState,
   RunSettings,
   SharingSettings,
   Stoppable,
 } from './types'
+
+/**
+ * Error information
+ */
+export const errorInfo: ErrorInfo = {
+  error: null,
+  type: ErrorTypes.Eval,
+}
 
 /**
  * Edit settings

@@ -8,6 +8,7 @@ import { App } from './App'
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
 import { getByRole, render, screen } from '@testing-library/react'
+import { ErrorTypes } from '@/states/types'
 
 describe('App component', () => {
   type JotaiPropsType = {
@@ -38,7 +39,7 @@ describe('App component', () => {
     <TestProvider
       initialValues={[
         [liveCodeAtom, ''],
-        [errorAtom, null],
+        [errorAtom, { error: null, type: ErrorTypes.Eval }],
       ]}
     >
       <App />

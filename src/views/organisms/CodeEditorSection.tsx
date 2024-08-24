@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useAtom } from 'jotai'
 
-import { CodeState } from '@/states/types'
+import { CodeState, ErrorTypes } from '@/states/types'
 import { errorAtom } from '@/states/atoms'
 import { useCodeState } from '@/views/hooks/hooks'
 import { CodeEditor } from '@/views/atoms/CodeEditor'
@@ -23,7 +23,7 @@ export const CodeEditorSection: React.FC<Props> = ({
   useEffect(() => {
     const handleError = (e: ErrorEvent) => {
       if (error !== null) {
-        setError(e.error)
+        setError({ error: e.error, type: ErrorTypes.Eval })
       }
     }
     window.addEventListener('error', handleError)

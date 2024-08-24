@@ -1,4 +1,35 @@
 /**
+ * Error type
+ */
+export const ErrorTypes = {
+  /**
+   * Eval
+   */
+  Eval: 'Eval',
+
+  /**
+   * Connection
+   */
+  Connection: 'Connection',
+} as const satisfies Record<string, string>
+export type ErrorType = (typeof ErrorTypes)[keyof typeof ErrorTypes]
+
+/**
+ * Error information
+ */
+export type ErrorInfo = {
+  /**
+   * Error instance
+   */
+  error: Error | null
+
+  /**
+   * Error type
+   */
+  type: ErrorType
+}
+
+/**
  * Stoppable - instance that has `stop` method
  * this is for runtime evaluation instance
  */
