@@ -213,7 +213,7 @@ const createErrorFrom = (invalidInfoList: InvalidInfo[]): Error => {
 export type Api = {
   setPlay: () => void
   // eslint-disable-next-line no-unused-vars
-  setEvalError: (_: Error | null) => void
+  setError: (_: Error | null) => void
 }
 
 /**
@@ -223,7 +223,7 @@ export type Api = {
  */
 export const executeCode = (code: string, api: Api): void => {
   try {
-    api.setEvalError(null)
+    api.setError(null)
 
     const errors = validateCode(code)
     if (0 < errors.length) {
@@ -241,7 +241,7 @@ export const executeCode = (code: string, api: Api): void => {
     new Function('Tone', 'LiveTone', `'use strict';${code}`)(Tone, LiveTone)
     api.setPlay()
   } catch (e) {
-    api.setEvalError(e as Error)
+    api.setError(e as Error)
     throw e
   }
 }

@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 import { useAtom } from 'jotai'
 
 import { CodeState } from '@/states/types'
-import { evalErrorAtom } from '@/states/atoms'
+import { errorAtom } from '@/states/atoms'
 import { useCodeState } from '@/views/hooks/hooks'
 import { CodeEditor } from '@/views/atoms/CodeEditor'
-import { EvalError } from '@/views/atoms/EvalError'
+import { ErrorReporter } from '@/views/atoms/ErrorReporter'
 import { CodeEditorSectionHeader } from './CodeEditorSectionHeader'
 
 type Props = React.ComponentProps<'section'>
@@ -18,19 +18,19 @@ type Props = React.ComponentProps<'section'>
 export const CodeEditorSection: React.FC<Props> = ({
   className,
 }): JSX.Element => {
-  const [evalError, setEvalError] = useAtom(evalErrorAtom)
+  const [error, setError] = useAtom(errorAtom)
 
   useEffect(() => {
     const handleError = (e: ErrorEvent) => {
-      if (evalError !== null) {
-        setEvalError(e.error)
+      if (error !== null) {
+        setError(e.error)
       }
     }
     window.addEventListener('error', handleError)
     return () => {
       window.removeEventListener('error', handleError)
     }
-  }, [evalError, setEvalError])
+  }, [error, setError])
 
   const classNames = [
     'textarea',
@@ -59,9 +59,9 @@ export const CodeEditorSection: React.FC<Props> = ({
       <div className={classNames.join(' ')}>
         <CodeEditor id="code" />
       </div>
-      {evalError !== null && (
+      {error !== null && (
         <div className="basis-1 mt-2">
-          <EvalError />
+          <ErrorReporter />
         </div>
       )}
     </section>

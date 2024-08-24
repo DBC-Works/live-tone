@@ -2,7 +2,7 @@ import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import * as Tone from 'tone'
 
-import { evalErrorAtom, liveCodeAtom } from '@/states/atoms'
+import { errorAtom, liveCodeAtom } from '@/states/atoms'
 import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
@@ -38,7 +38,7 @@ describe('App component', () => {
     <TestProvider
       initialValues={[
         [liveCodeAtom, ''],
-        [evalErrorAtom, null],
+        [errorAtom, null],
       ]}
     >
       <App />

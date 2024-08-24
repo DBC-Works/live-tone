@@ -58,9 +58,9 @@ export const resetRunningStateAtom = atom(null, (_, set) => {
 export const liveCodeAtom = atomWithStorage('liveCode', '')
 
 /**
- * Eval error atom
+ * Error atom
  */
-export const evalErrorAtom = atom<Error | null>(null)
+export const errorAtom = atom<Error | null>(null)
 
 /**
  * Run settings atom

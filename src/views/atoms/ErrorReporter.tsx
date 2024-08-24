@@ -1,14 +1,14 @@
 import { useAtomValue } from 'jotai'
 
-import { evalErrorAtom } from '@/states/atoms'
+import { errorAtom } from '@/states/atoms'
 
 /**
- * Eval error report component
+ * Error report component
  * @returns rendering result
  */
-export const EvalError: React.FC = (): JSX.Element | null => {
-  const evalError = useAtomValue(evalErrorAtom)
-  if (evalError === null) {
+export const ErrorReporter: React.FC = (): JSX.Element | null => {
+  const error = useAtomValue(errorAtom)
+  if (error === null) {
     return null
   }
 
@@ -27,7 +27,7 @@ export const EvalError: React.FC = (): JSX.Element | null => {
           d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <span>{evalError.toString()}</span>
+      <span>{error.toString()}</span>
     </div>
   )
 }
