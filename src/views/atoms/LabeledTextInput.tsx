@@ -10,6 +10,7 @@ export const LabeledTextInput: React.FC<Props> = ({
   type,
   children,
   value,
+  readOnly,
   onChange,
 }): JSX.Element => (
   <div>
@@ -24,6 +25,7 @@ export const LabeledTextInput: React.FC<Props> = ({
         id={id}
         className="input input-bordered input-sm w-full"
         value={value}
+        readOnly={readOnly}
         onChange={onChange}
       />
     </div>
