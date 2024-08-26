@@ -18,19 +18,17 @@ type Props = React.ComponentProps<'section'>
 export const CodeEditorSection: React.FC<Props> = ({
   className,
 }): JSX.Element => {
-  const [error, setError] = useAtom(errorAtom)
+  const [errorInfo, setErrorInfo] = useAtom(errorAtom)
 
   useEffect(() => {
     const handleError = (e: ErrorEvent) => {
-      if (error !== null) {
-        setError({ error: e.error, type: ErrorTypes.Eval })
-      }
+      setErrorInfo({ error: e.error, type: ErrorTypes.Eval })
     }
     window.addEventListener('error', handleError)
     return () => {
       window.removeEventListener('error', handleError)
     }
-  }, [error, setError])
+  }, [setErrorInfo])
 
   const classNames = [
     'textarea',
@@ -59,7 +57,7 @@ export const CodeEditorSection: React.FC<Props> = ({
       <div className={classNames.join(' ')}>
         <CodeEditor id="code" />
       </div>
-      {error !== null && (
+      {errorInfo.error !== null && (
         <div className="basis-1 mt-2">
           <ErrorReporter />
         </div>
