@@ -1,3 +1,5 @@
+import { WebSocketConnector } from '@/communications/ws/WebSocketConnector'
+
 /**
  * Error type
  */
@@ -114,4 +116,56 @@ export type SharingSettings = {
    * Tag of code
    */
   tagOfCode: string
+}
+
+/**
+ * Connectable state
+ */
+export const ConnectableStates = {
+  /**
+   * Lack of input
+   */
+  LackOfInput: 'Lack of input',
+
+  /**
+   * Invalid url
+   */
+  InvalidUrl: 'Invalid url',
+
+  /**
+   * Connectable
+   */
+  Connectable: 'Connectable',
+} as const satisfies Record<string, string>
+export type ConnectableState =
+  (typeof ConnectableStates)[keyof typeof ConnectableStates]
+
+/**
+ * Connection state
+ */
+export const ConnectionStates = {
+  /**
+   * Disconnected
+   */
+  Disconnected: 'Disconnected',
+
+  /**
+   * Connected
+   */
+  Connecting: 'Connecting',
+
+  /**
+   * Connected
+   */
+  Connected: 'Connected',
+} as const satisfies Record<string, string>
+export type ConnectionState =
+  (typeof ConnectionStates)[keyof typeof ConnectionStates]
+
+/**
+ * WebSocket connection info
+ */
+export type WebSocketConnectionInfo = {
+  connector: WebSocketConnector | null
+  state: ConnectionState
 }
