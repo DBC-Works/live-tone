@@ -19,6 +19,13 @@ export default defineConfig({
         find: /^tone$/,
         replacement: path.resolve(__dirname, './src/__mock__/tone.ts'),
       },
+      {
+        find: /.*\/WSServerAccessor$/,
+        replacement: path.resolve(
+          __dirname,
+          './src/__mock__/WSServerAccessor.ts'
+        ),
+      },
     ],
     coverage: {
       exclude: ['__mock__', '**/types.ts', 'main.tsx', 'vite-env.d.ts'],
