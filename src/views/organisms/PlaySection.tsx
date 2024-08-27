@@ -9,7 +9,7 @@ type Props = React.ComponentProps<'section'>
  * @returns rendering result
  */
 export const PlaySection: React.FC<Props> = ({ className }): JSX.Element => (
-  <section className={`grid grid-cols-2 gap-4 mb-4 ${className}`}>
+  <section className={`grid grid-cols-2 gap-4 ${className}`}>
     <RunButton />
     <StopButton />
   </section>

@@ -13,8 +13,14 @@ body {
     env(safe-area-inset-bottom) calc(env(safe-area-inset-left) + 1rem);
 }
 
+.btn svg {
+  fill: oklch(var(--n));
+}
 .btn-primary svg {
   fill: oklch(var(--pc));
+}
+.btn:disabled svg {
+  fill: oklch(var(--n) / var(--tw-text-opacity));
 }
 .btn-primary:disabled svg {
   fill: oklch(var(--bc) / var(--tw-text-opacity));

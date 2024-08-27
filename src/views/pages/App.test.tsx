@@ -2,13 +2,13 @@ import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import * as Tone from 'tone'
 
+import { ErrorTypes } from '@/states/types'
 import { errorAtom, liveCodeAtom } from '@/states/atoms'
 import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
 import { getByRole, render, screen } from '@testing-library/react'
-import { ErrorTypes } from '@/states/types'
 
 describe('App component', () => {
   type JotaiPropsType = {
@@ -276,6 +276,108 @@ describe('App component', () => {
     })
   })
 
+  describe('Sharing section', () => {
+    describe('"Connect" / "Disconnect" button', () => {
+      it('should be visible if both the WebSocket server url and the tag are entered', async () => {
+        // arrange
+        setup()
+        expect(
+          screen.queryByRole('button', { name: 'Connect' })
+        ).not.toBeInTheDocument()
+
+        // act
+        const urlTextbox = screen.getByLabelText(
+          'Azure Web PubSub client access URL'
+        )
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'invalid url')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+
+        // assert
+        const connectButton = screen.getByRole('button', { name: 'Connect' })
+        expect(connectButton).toBeInTheDocument()
+        expect(connectButton).toBeDisabled()
+      })
+
+      it('should enable if WebSocket server url is valid', async () => {
+        // arrange
+        setup()
+
+        // act
+        const urlTextbox = screen.getByLabelText(
+          'Azure Web PubSub client access URL'
+        )
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+
+        // assert
+        const connectButton = screen.getByRole('button', { name: 'Connect' })
+        expect(connectButton).toBeInTheDocument()
+        expect(connectButton).toBeEnabled()
+      })
+
+      it('should try to connect to a WebSocket server when clicked while not connected and, if successful, update associated components', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText(
+          'Azure Web PubSub client access URL'
+        )
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+        // assert
+        const disconnectButton = await screen.findByRole('button', {
+          name: 'Disconnect',
+        })
+        expect(disconnectButton).toBeInTheDocument()
+        expect(disconnectButton).toBeEnabled()
+
+        expect(urlTextbox).toHaveAttribute('readonly')
+        expect(tagTextbox).toHaveAttribute('readonly')
+      })
+
+      it('should try to disconnect from a WebSocket server when clicked while connecting and, if successful, update associated components', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText(
+          'Azure Web PubSub client access URL'
+        )
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+        // act
+        await user.click(
+          await screen.findByRole('button', { name: 'Disconnect' })
+        )
+
+        // assert
+        const connectButton = await screen.findByRole('button', {
+          name: 'Connect',
+        })
+        expect(connectButton).toBeInTheDocument()
+        expect(connectButton).toBeEnabled()
+
+        expect(urlTextbox).not.toHaveAttribute('readonly')
+        expect(tagTextbox).not.toHaveAttribute('readonly')
+      })
+    })
+  })
+
   describe('Settings section', () => {
     it('should the heading "Sharing settings"', () => {
       // arrange & act
@@ -304,6 +406,40 @@ describe('App component', () => {
 
       // assert
       expect(screen.getByLabelText('Tag of your code'))
+    })
+  })
+
+  describe('lifecycle', () => {
+    describe('unload', () => {
+      it('should try to disconnect from a WebSocket server if connected', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText(
+          'Azure Web PubSub client access URL'
+        )
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+        expect(
+          await screen.findByRole('button', { name: 'Disconnect' })
+        ).toBeInTheDocument()
+
+        // act
+        window.dispatchEvent(new Event('beforeunload'))
+
+        // assert
+        const connectButton = await screen.findByRole('button', {
+          name: 'Connect',
+        })
+        expect(connectButton).toBeInTheDocument()
+        expect(connectButton).toBeEnabled()
+
+        expect(urlTextbox).not.toHaveAttribute('readonly')
+        expect(tagTextbox).not.toHaveAttribute('readonly')
+      })
     })
   })
 })

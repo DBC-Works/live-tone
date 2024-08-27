@@ -1,7 +1,8 @@
 import { ChangeEvent, useCallback } from 'react'
-import { useAtom } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 
-import { webSocketServerUrlAtom } from '@/states/atoms'
+import { ConnectionStates } from '@/states/types'
+import { connectionStateAtom, webSocketServerUrlAtom } from '@/states/atoms'
 import { LabeledTextInput } from '@/views/atoms/LabeledTextInput'
 
 type Props = React.ComponentProps<'input'>
@@ -14,6 +15,8 @@ export const WebSocketServerUrlInput: React.FC<Props> = (): JSX.Element => {
   const [webSocketServerUrl, setWebSocketServerUrl] = useAtom(
     webSocketServerUrlAtom
   )
+  const connectionState = useAtomValue(connectionStateAtom)
+
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setWebSocketServerUrl(e.target.value)
@@ -26,6 +29,7 @@ export const WebSocketServerUrlInput: React.FC<Props> = (): JSX.Element => {
       id="ws-url"
       type="url"
       value={webSocketServerUrl}
+      readOnly={connectionState === ConnectionStates.Connected}
       onChange={handleChange}
     >
       Azure Web PubSub client access URL
