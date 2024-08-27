@@ -32,7 +32,7 @@ export const WebSocketServerUrlInput: React.FC<Props> = (): JSX.Element => {
       readOnly={connectionState === ConnectionStates.Connected}
       onChange={handleChange}
     >
-      Azure Web PubSub client access URL
+      WebSocket server URL
     </LabeledTextInput>
   )
 }

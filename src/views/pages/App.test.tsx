@@ -278,7 +278,7 @@ describe('App component', () => {
 
   describe('Sharing section', () => {
     describe('"Connect" / "Disconnect" button', () => {
-      it('should be visible if both the WebSocket server url and the tag are entered', async () => {
+      it('should be visible if both the WebSocket server URL and the tag are entered', async () => {
         // arrange
         setup()
         expect(
@@ -286,9 +286,7 @@ describe('App component', () => {
         ).not.toBeInTheDocument()
 
         // act
-        const urlTextbox = screen.getByLabelText(
-          'Azure Web PubSub client access URL'
-        )
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
         urlTextbox.focus()
         await user.type(urlTextbox, 'invalid url')
         const tagTextbox = screen.getByLabelText('Tag of your code')
@@ -301,14 +299,12 @@ describe('App component', () => {
         expect(connectButton).toBeDisabled()
       })
 
-      it('should enable if WebSocket server url is valid', async () => {
+      it('should enable if WebSocket server URL is valid', async () => {
         // arrange
         setup()
 
         // act
-        const urlTextbox = screen.getByLabelText(
-          'Azure Web PubSub client access URL'
-        )
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
         urlTextbox.focus()
         await user.type(urlTextbox, 'wss://example.com')
         const tagTextbox = screen.getByLabelText('Tag of your code')
@@ -324,9 +320,7 @@ describe('App component', () => {
       it('should try to connect to a WebSocket server when clicked while not connected and, if successful, update associated components', async () => {
         // arrange
         setup()
-        const urlTextbox = screen.getByLabelText(
-          'Azure Web PubSub client access URL'
-        )
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
         urlTextbox.focus()
         await user.type(urlTextbox, 'wss://example.com')
         const tagTextbox = screen.getByLabelText('Tag of your code')
@@ -350,9 +344,7 @@ describe('App component', () => {
       it('should try to disconnect from a WebSocket server when clicked while connecting and, if successful, update associated components', async () => {
         // arrange
         setup()
-        const urlTextbox = screen.getByLabelText(
-          'Azure Web PubSub client access URL'
-        )
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
         urlTextbox.focus()
         await user.type(urlTextbox, 'wss://example.com')
         const tagTextbox = screen.getByLabelText('Tag of your code')
@@ -392,12 +384,12 @@ describe('App component', () => {
       )
     })
 
-    it('should exists "Azure Web PubSub client access URL" input text field', () => {
+    it('should exists "WebSocket server URL" input text field', () => {
       // arrange & act
       setup()
 
       // assert
-      expect(screen.getByLabelText('Azure Web PubSub client access URL'))
+      expect(screen.getByLabelText('WebSocket server URL'))
     })
 
     it('should exist "Tag of your code" input text field', () => {
@@ -414,9 +406,7 @@ describe('App component', () => {
       it('should try to disconnect from a WebSocket server if connected', async () => {
         // arrange
         setup()
-        const urlTextbox = screen.getByLabelText(
-          'Azure Web PubSub client access URL'
-        )
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
         urlTextbox.focus()
         await user.type(urlTextbox, 'wss://example.com')
         const tagTextbox = screen.getByLabelText('Tag of your code')
