@@ -1,3 +1,36 @@
+import { WebSocketConnector } from '@/communications/ws/WebSocketConnector'
+
+/**
+ * Error type
+ */
+export const ErrorTypes = {
+  /**
+   * Eval
+   */
+  Eval: 'Eval',
+
+  /**
+   * Connection
+   */
+  Connection: 'Connection',
+} as const satisfies Record<string, string>
+export type ErrorType = (typeof ErrorTypes)[keyof typeof ErrorTypes]
+
+/**
+ * Error information
+ */
+export type ErrorInfo = {
+  /**
+   * Error instance
+   */
+  error: Error | null
+
+  /**
+   * Error type
+   */
+  type: ErrorType
+}
+
 /**
  * Stoppable - instance that has `stop` method
  * this is for runtime evaluation instance
@@ -83,4 +116,56 @@ export type SharingSettings = {
    * Tag of code
    */
   tagOfCode: string
+}
+
+/**
+ * Connectable state
+ */
+export const ConnectableStates = {
+  /**
+   * Lack of input
+   */
+  LackOfInput: 'Lack of input',
+
+  /**
+   * Invalid url
+   */
+  InvalidUrl: 'Invalid url',
+
+  /**
+   * Connectable
+   */
+  Connectable: 'Connectable',
+} as const satisfies Record<string, string>
+export type ConnectableState =
+  (typeof ConnectableStates)[keyof typeof ConnectableStates]
+
+/**
+ * Connection state
+ */
+export const ConnectionStates = {
+  /**
+   * Disconnected
+   */
+  Disconnected: 'Disconnected',
+
+  /**
+   * Connected
+   */
+  Connecting: 'Connecting',
+
+  /**
+   * Connected
+   */
+  Connected: 'Connected',
+} as const satisfies Record<string, string>
+export type ConnectionState =
+  (typeof ConnectionStates)[keyof typeof ConnectionStates]
+
+/**
+ * WebSocket connection info
+ */
+export type WebSocketConnectionInfo = {
+  connector: WebSocketConnector | null
+  state: ConnectionState
 }

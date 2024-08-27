@@ -1,11 +1,11 @@
-import { ToolSection } from './ToolSection'
+import { PlaySection } from './PlaySection'
 
 import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
 
-describe('ToolBar component', () => {
+describe('PlaySection component', () => {
   const setup = () => {
-    render(<ToolSection />)
+    render(<PlaySection />)
   }
 
   it('should contain "Run" button', () => {

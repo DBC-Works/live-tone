@@ -1,10 +1,22 @@
 import {
+  ConnectionStates,
   EditSettings,
+  ErrorInfo,
+  ErrorTypes,
   RunningState,
   RunSettings,
   SharingSettings,
   Stoppable,
+  WebSocketConnectionInfo,
 } from './types'
+
+/**
+ * Error information
+ */
+export const errorInfo: ErrorInfo = {
+  error: null,
+  type: ErrorTypes.Eval,
+}
 
 /**
  * Edit settings
@@ -35,4 +47,12 @@ export const runningState: RunningState = {
   nowPlaying: false,
   updated: false,
   registeredPlayings: new Set<Stoppable>([]),
+}
+
+/**
+ * WebSocket server connection info
+ */
+export const webSocketConnectionInfo: WebSocketConnectionInfo = {
+  connector: null,
+  state: ConnectionStates.Disconnected,
 }

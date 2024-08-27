@@ -14,6 +14,7 @@ import {
 } from '@/utilities/errors'
 import { Nmb } from '@/utilities/number'
 import { Scale } from '@/utilities/music/scale'
+import { ErrorInfo, ErrorTypes } from '@/states/types'
 
 /**
  * Invalid types
@@ -213,7 +214,7 @@ const createErrorFrom = (invalidInfoList: InvalidInfo[]): Error => {
 export type Api = {
   setPlay: () => void
   // eslint-disable-next-line no-unused-vars
-  setEvalError: (_: Error | null) => void
+  setError: (_: ErrorInfo) => void
 }
 
 /**
@@ -223,7 +224,7 @@ export type Api = {
  */
 export const executeCode = (code: string, api: Api): void => {
   try {
-    api.setEvalError(null)
+    api.setError({ error: null, type: ErrorTypes.Eval })
 
     const errors = validateCode(code)
     if (0 < errors.length) {
@@ -241,7 +242,7 @@ export const executeCode = (code: string, api: Api): void => {
     new Function('Tone', 'LiveTone', `'use strict';${code}`)(Tone, LiveTone)
     api.setPlay()
   } catch (e) {
-    api.setEvalError(e as Error)
+    api.setError({ error: e as Error, type: ErrorTypes.Eval })
     throw e
   }
 }

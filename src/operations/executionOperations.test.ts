@@ -1,17 +1,18 @@
 import { Mock } from 'vitest'
 import { Api, executeCode } from './executionOperations'
+import { ErrorInfo, ErrorTypes } from '@/states/types'
 
 describe('executionOperation', () => {
   describe('executeCode', () => {
     const createApiMock = () => {
-      const apiMock: { error: Error | null } & Api = {
-        error: null,
+      const apiMock: { errorInfo: ErrorInfo | null } & Api = {
+        errorInfo: null,
         setPlay: vi.fn(),
-        setEvalError: vi.fn(),
+        setError: vi.fn(),
       }
-      const setEvalErrorMock = apiMock.setEvalError as Mock
-      setEvalErrorMock.mockImplementation((e: Error | null) => {
-        apiMock.error = e
+      const setErrorMock = apiMock.setError as Mock
+      setErrorMock.mockImplementation((errorInfo: ErrorInfo) => {
+        apiMock.errorInfo = errorInfo
       })
       return apiMock
     }
@@ -29,8 +30,11 @@ describe('executionOperation', () => {
 
       // assert
       expect(apiMock.setPlay).toHaveBeenCalledTimes(1)
-      expect(apiMock.setEvalError).toHaveBeenCalledTimes(1)
-      expect(apiMock.setEvalError).toHaveBeenLastCalledWith(null)
+      expect(apiMock.setError).toHaveBeenCalledTimes(1)
+      expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+        error: null,
+        type: ErrorTypes.Eval,
+      })
     })
 
     it('should throw an error if code is invalid', () => {
@@ -44,9 +48,12 @@ describe('executionOperation', () => {
 
       // assert
       expect(apiMock.setPlay).not.toHaveBeenCalled()
-      expect(apiMock.setEvalError).toHaveBeenCalledTimes(2)
-      expect(apiMock.setEvalError).toHaveBeenNthCalledWith(1, null)
-      expect(apiMock.setEvalError).toHaveBeenLastCalledWith(expect.anything())
+      expect(apiMock.setError).toHaveBeenCalledTimes(2)
+      expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+        error: null,
+        type: ErrorTypes.Eval,
+      })
+      expect(apiMock.setError).toHaveBeenLastCalledWith(expect.anything())
     })
 
     it.each([
@@ -90,10 +97,13 @@ describe('executionOperation', () => {
 
         // assert
         expect(apiMock.setPlay).not.toHaveBeenCalled()
-        expect(apiMock.setEvalError).toHaveBeenCalledTimes(2)
-        expect(apiMock.setEvalError).toHaveBeenNthCalledWith(1, null)
-        expect(apiMock.setEvalError).toHaveBeenLastCalledWith(expect.anything())
-        expect(apiMock.error!.message).toEqual(
+        expect(apiMock.setError).toHaveBeenCalledTimes(2)
+        expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+          error: null,
+          type: ErrorTypes.Eval,
+        })
+        expect(apiMock.setError).toHaveBeenLastCalledWith(expect.anything())
+        expect(apiMock.errorInfo!.error!.message).toEqual(
           `Calling the '${keyword}' is not allowed`
         )
       }
@@ -117,10 +127,13 @@ describe('executionOperation', () => {
 
         // assert
         expect(apiMock.setPlay).not.toHaveBeenCalled()
-        expect(apiMock.setEvalError).toHaveBeenCalledTimes(2)
-        expect(apiMock.setEvalError).toHaveBeenNthCalledWith(1, null)
-        expect(apiMock.setEvalError).toHaveBeenLastCalledWith(expect.anything())
-        expect(apiMock.error!.message).toEqual(
+        expect(apiMock.setError).toHaveBeenCalledTimes(2)
+        expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+          error: null,
+          type: ErrorTypes.Eval,
+        })
+        expect(apiMock.setError).toHaveBeenLastCalledWith(expect.anything())
+        expect(apiMock.errorInfo!.error!.message).toEqual(
           `Creation of an instance of '${keyword}' is not allowed`
         )
       }
@@ -174,10 +187,13 @@ describe('executionOperation', () => {
 
         // assert
         expect(apiMock.setPlay).not.toHaveBeenCalled()
-        expect(apiMock.setEvalError).toHaveBeenCalledTimes(2)
-        expect(apiMock.setEvalError).toHaveBeenNthCalledWith(1, null)
-        expect(apiMock.setEvalError).toHaveBeenLastCalledWith(expect.anything())
-        expect(apiMock.error!.message).toEqual(
+        expect(apiMock.setError).toHaveBeenCalledTimes(2)
+        expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+          error: null,
+          type: ErrorTypes.Eval,
+        })
+        expect(apiMock.setError).toHaveBeenLastCalledWith(expect.anything())
+        expect(apiMock.errorInfo!.error!.message).toEqual(
           `Referencing the '${keyword}' property is not allowed`
         )
       }
@@ -194,10 +210,13 @@ describe('executionOperation', () => {
 
       // assert
       expect(apiMock.setPlay).not.toHaveBeenCalled()
-      expect(apiMock.setEvalError).toHaveBeenCalledTimes(2)
-      expect(apiMock.setEvalError).toHaveBeenNthCalledWith(1, null)
-      expect(apiMock.setEvalError).toHaveBeenLastCalledWith(expect.anything())
-      expect(apiMock.error!.message).toMatch(
+      expect(apiMock.setError).toHaveBeenCalledTimes(2)
+      expect(apiMock.setError).toHaveBeenNthCalledWith(1, {
+        error: null,
+        type: ErrorTypes.Eval,
+      })
+      expect(apiMock.setError).toHaveBeenLastCalledWith(expect.anything())
+      expect(apiMock.errorInfo!.error!.message).toMatch(
         /^Contains invalid codes\(such as:/
       )
     })

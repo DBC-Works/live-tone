@@ -1,12 +1,17 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
+import { ConnectableStates, ConnectionStates, ErrorTypes } from './types'
 import {
   editSettings,
+  errorInfo,
   runningState,
   runSettings,
   sharingSettings,
+  webSocketConnectionInfo,
 } from './states'
+import { newAccessor } from '@/communications/ws/WSServerAccessor'
+import { WebSocketConnector } from '@/communications/ws/WebSocketConnector'
 
 /**
  * Running state atom
@@ -58,9 +63,9 @@ export const resetRunningStateAtom = atom(null, (_, set) => {
 export const liveCodeAtom = atomWithStorage('liveCode', '')
 
 /**
- * Eval error atom
+ * Error information atom
  */
-export const evalErrorAtom = atom<Error | null>(null)
+export const errorAtom = atom(errorInfo)
 
 /**
  * Run settings atom
@@ -136,3 +141,97 @@ export const tagOfCodeAtom = atom(
     })
   }
 )
+
+/**
+ * Connectable state read-only atom
+ */
+export const connectableStateAtom = atom((get) => {
+  const { webSocketServerUrl, tagOfCode } = get(sharingSettingsAtom)
+  if (webSocketServerUrl.length === 0 || tagOfCode.length === 0) {
+    return ConnectableStates.LackOfInput
+  }
+
+  return URL.canParse(webSocketServerUrl) !== false
+    ? ConnectableStates.Connectable
+    : ConnectableStates.InvalidUrl
+})
+
+/**
+ * Connection information atom
+ */
+const connectionInfoAtom = atom(webSocketConnectionInfo)
+
+/**
+ * Connection state read-only atom
+ */
+export const connectionStateAtom = atom((get) => get(connectionInfoAtom).state)
+
+/**
+ * Connect write-only atom
+ */
+export const connectAtom = atom(null, (get, set) => {
+  const { webSocketServerUrl } = get(sharingSettingsAtom)
+  if (
+    webSocketServerUrl === null ||
+    URL.canParse(webSocketServerUrl) === false
+  ) {
+    throw new Error('Invalid WebSocket server url')
+  }
+
+  const connectionInfo = get(connectionInfoAtom)
+  let { connector, state } = connectionInfo
+  try {
+    if (connector === null) {
+      const accessor = newAccessor(webSocketServerUrl, (state, asError) => {
+        set(connectionInfoAtom, {
+          connector: state === ConnectionStates.Disconnected ? null : connector,
+          state,
+        })
+        if (asError !== false) {
+          const error = new Error('Fail to connect to WebSocket server')
+          set(errorAtom, { error, type: ErrorTypes.Connection })
+          throw error
+        }
+      })
+      connector = WebSocketConnector.newInstance(accessor)
+      // eslint-disable-next-line no-unused-vars
+      connector.open((_message) => {
+        // TODO: implement
+      })
+      state = ConnectionStates.Connecting
+    }
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
+    connector = null
+    state = ConnectionStates.Disconnected
+    throw e
+  }
+
+  return {
+    connector,
+    state,
+  }
+})
+
+/**
+ * Disconnect write-only atom
+ */
+export const disconnectAtom = atom(null, (get, set) => {
+  const connectionInfo = get(connectionInfoAtom)
+  const { connector, state } = connectionInfo
+  if (connector === null || state !== ConnectionStates.Connected) {
+    throw new Error('Disconnected')
+  }
+
+  try {
+    connector.close()
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
+    throw e
+  }
+
+  return {
+    connector: null,
+    state: ConnectionStates.Disconnected,
+  }
+})
