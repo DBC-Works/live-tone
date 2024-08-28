@@ -28,7 +28,14 @@ export default defineConfig({
       },
     ],
     coverage: {
-      exclude: ['__mock__', '**/types.ts', 'main.tsx', 'vite-env.d.ts'],
+      exclude: [
+        '__mock__',
+        '**/types.ts',
+        'main.tsx',
+        'vite-env.d.ts',
+        '**/WSServerAccessor.ts',
+      ],
+      reporter: ['text', 'json', 'html'],
     },
   },
 })
