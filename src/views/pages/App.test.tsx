@@ -8,7 +8,7 @@ import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
-import { getByRole, render, screen } from '@testing-library/react'
+import { act, getByRole, render, screen } from '@testing-library/react'
 
 describe('App component', () => {
   type JotaiPropsType = {
@@ -418,7 +418,9 @@ describe('App component', () => {
         ).toBeInTheDocument()
 
         // act
-        window.dispatchEvent(new Event('beforeunload'))
+        act(() => {
+          window.dispatchEvent(new Event('beforeunload'))
+        })
 
         // assert
         const connectButton = await screen.findByRole('button', {
