@@ -22,25 +22,21 @@ export const runningStateAtom = atom(runningState)
  * Update write-only atom
  */
 export const updateAtom = atom(null, (_, set) => {
-  set(runningStateAtom, (runningState) => {
-    return {
-      ...runningState,
-      updated: true,
-    }
-  })
+  set(runningStateAtom, (runningState) => ({
+    ...runningState,
+    updated: true,
+  }))
 })
 
 /**
  * Play write-only atom
  */
 export const playAtom = atom(null, (_, set) => {
-  set(runningStateAtom, (runningState) => {
-    return {
-      ...runningState,
-      nowPlaying: true,
-      updated: false,
-    }
-  })
+  set(runningStateAtom, (runningState) => ({
+    ...runningState,
+    nowPlaying: true,
+    updated: false,
+  }))
 })
 
 /**
@@ -78,12 +74,10 @@ export const runSettingsAtom = atomWithStorage('RunSettings', runSettings)
 export const cancelTransportOnStopRunSettingsAtom = atom(
   (get) => get(runSettingsAtom).cancelTransportOnStop,
   (_, set) => {
-    set(runSettingsAtom, (runSettings) => {
-      return {
-        ...runSettings,
-        cancelTransportOnStop: !runSettings.cancelTransportOnStop,
-      }
-    })
+    set(runSettingsAtom, (runSettings) => ({
+      ...runSettings,
+      cancelTransportOnStop: !runSettings.cancelTransportOnStop,
+    }))
   }
 )
 
@@ -98,12 +92,10 @@ export const editSettingsAtom = atomWithStorage('EditSettings', editSettings)
 export const enableLiveAutoCompletionEditSettingsAtom = atom(
   (get) => get(editSettingsAtom).enableLiveAutoCompletion,
   (_, set) => {
-    set(editSettingsAtom, (editSettings) => {
-      return {
-        ...editSettings,
-        enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
-      }
-    })
+    set(editSettingsAtom, (editSettings) => ({
+      ...editSettings,
+      enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
+    }))
   }
 )
 
@@ -118,12 +110,10 @@ export const sharingSettingsAtom = atom(sharingSettings)
 export const webSocketServerUrlAtom = atom(
   (get) => get(sharingSettingsAtom).webSocketServerUrl,
   (_, set, value: string) => {
-    set(sharingSettingsAtom, (sharingSettings) => {
-      return {
-        ...sharingSettings,
-        webSocketServerUrl: value,
-      }
-    })
+    set(sharingSettingsAtom, (sharingSettings) => ({
+      ...sharingSettings,
+      webSocketServerUrl: value,
+    }))
   }
 )
 
@@ -133,12 +123,10 @@ export const webSocketServerUrlAtom = atom(
 export const tagOfCodeAtom = atom(
   (get) => get(sharingSettingsAtom).tagOfCode,
   (_, set, value: string) => {
-    set(sharingSettingsAtom, (sharingSettings) => {
-      return {
-        ...sharingSettings,
-        tagOfCode: value,
-      }
-    })
+    set(sharingSettingsAtom, (sharingSettings) => ({
+      ...sharingSettings,
+      tagOfCode: value,
+    }))
   }
 )
 
@@ -205,11 +193,11 @@ export const connectAtom = atom(null, (get, set) => {
     connector = null
     state = ConnectionStates.Disconnected
     throw e
-  }
-
-  return {
-    connector,
-    state,
+  } finally {
+    set(connectionInfoAtom, {
+      connector,
+      state,
+    })
   }
 })
 
@@ -228,10 +216,10 @@ export const disconnectAtom = atom(null, (get, set) => {
   } catch (e) {
     set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
     throw e
-  }
-
-  return {
-    connector: null,
-    state: ConnectionStates.Disconnected,
+  } finally {
+    set(connectionInfoAtom, {
+      connector: null,
+      state: ConnectionStates.Disconnected,
+    })
   }
 })
