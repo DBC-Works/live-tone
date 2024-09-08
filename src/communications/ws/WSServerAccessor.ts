@@ -124,15 +124,15 @@ export class WebSocketServerAccessor implements WSServerAccessor {
       console.log('WebSocketServerAccessor: receive message.', event)
       onReceive(event.data as string)
     })
-    this.client.addEventListener('close', () => {
-      console.log('WebSocketServerAccessor: closed.')
+    this.client.addEventListener('close', (event) => {
+      console.log('WebSocketServerAccessor: closed.', event)
       if (this.state !== ConnectionStates.Disconnected) {
         this.state = ConnectionStates.Disconnected
         this.onChangeState(ConnectionStates.Disconnected, false)
       }
     })
     this.client.addEventListener('error', (event) => {
-      console.log(`AzureWebPubSubAccessor: receive error.`, event)
+      console.log(`WebSocketServerAccessor: receive error.`, event)
       this.state = ConnectionStates.Disconnected
       this.onChangeState(ConnectionStates.Disconnected, true)
     })
@@ -143,6 +143,7 @@ export class WebSocketServerAccessor implements WSServerAccessor {
    * @param message Message to send
    */
   public send(message: string): void {
+    console.log(`WebSocketServerAccessor: send message.`, message)
     if (this.client === null || this.state !== ConnectionStates.Connected) {
       throw new Error('Disconnected')
     }
@@ -154,6 +155,7 @@ export class WebSocketServerAccessor implements WSServerAccessor {
    * Close connection
    */
   public close(): void {
+    console.log(`WebSocketServerAccessor: close connection.`)
     if (this.client === null || this.state !== ConnectionStates.Connected) {
       throw new Error('Disconnected')
     }
