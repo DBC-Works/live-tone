@@ -13,7 +13,7 @@ describe('WebSocketConnector', () => {
 
     try {
       // act
-      connector.open(() => {})
+      connector.open(() => {}, 'group')
       await waitFor(() => {
         expect(connector.connected).toEqual(true)
       })
@@ -43,7 +43,7 @@ describe('WebSocketConnector', () => {
       let receivedMessage: string | null = null
       connector.open((message) => {
         receivedMessage = message
-      })
+      }, 'group')
       await waitFor(() => {
         expect(connector.connected).toEqual(true)
       })

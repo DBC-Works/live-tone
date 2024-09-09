@@ -1,14 +1,19 @@
 import {
   ReceiveHandler,
   ChangeStateEventHandler,
-  WSServerAccessor,
+  WebSocketServerAccessor,
 } from '@/communications/ws/WSServerAccessor'
 import { ConnectionStates } from '@/states/types'
 
-class TestDoubleAccessor implements WSServerAccessor {
+interface Accessor extends WebSocketServerAccessor {
+  get latestMessage(): string | null
+}
+
+class TestDoubleAccessor implements Accessor {
   private onChangeState: ChangeStateEventHandler
   private onReceive: ReceiveHandler | null = null
   private opened = false
+  private sendedMessage: string | null = null
 
   constructor(onChangeState: ChangeStateEventHandler) {
     this.onChangeState = onChangeState
@@ -18,7 +23,12 @@ class TestDoubleAccessor implements WSServerAccessor {
     return this.opened
   }
 
-  public open(onReceive: ReceiveHandler): void {
+  get latestMessage(): string | null {
+    return this.sendedMessage
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  public open(onReceive: ReceiveHandler, _group: string): void {
     this.opened = true
     this.onReceive = onReceive
     setTimeout(() => {
@@ -30,6 +40,7 @@ class TestDoubleAccessor implements WSServerAccessor {
     if (this.onReceive === null) {
       throw new Error()
     }
+    this.sendedMessage = message
 
     this.onReceive(message)
   }
@@ -40,7 +51,14 @@ class TestDoubleAccessor implements WSServerAccessor {
   }
 }
 
+let testDoubleAccessor: TestDoubleAccessor | null = null
+
 export const newAccessor = (
   _: string,
   onChangeState: ChangeStateEventHandler
-) => new TestDoubleAccessor(onChangeState)
+) => {
+  testDoubleAccessor = new TestDoubleAccessor(onChangeState)
+  return testDoubleAccessor
+}
+
+export const getTestDoubleAccessor = () => testDoubleAccessor

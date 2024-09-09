@@ -1,4 +1,4 @@
-import { ReceiveHandler, WSServerAccessor } from './WSServerAccessor'
+import { ReceiveHandler, WebSocketServerAccessor } from './WSServerAccessor'
 
 /**
  * WebSocket connector
@@ -7,14 +7,16 @@ export class WebSocketConnector {
   /**
    * WebSocket server accessor
    */
-  private readonly accessor: WSServerAccessor
+  private readonly accessor: WebSocketServerAccessor
 
   /**
    * Create new instance
    * @param accessor Accessor
    * @returns New instance
    */
-  public static newInstance(accessor: WSServerAccessor): WebSocketConnector {
+  public static newInstance(
+    accessor: WebSocketServerAccessor
+  ): WebSocketConnector {
     return new WebSocketConnector(accessor)
   }
 
@@ -22,7 +24,7 @@ export class WebSocketConnector {
    * Constructor
    * @param accessor Accessor
    */
-  private constructor(accessor: WSServerAccessor) {
+  private constructor(accessor: WebSocketServerAccessor) {
     this.accessor = accessor
   }
 
@@ -36,9 +38,10 @@ export class WebSocketConnector {
   /**
    * Open connection
    * @param onReceive Receive handler
+   * @param group Group to send
    */
-  public open(onReceive: ReceiveHandler): void {
-    this.accessor.open(onReceive)
+  public open(onReceive: ReceiveHandler, group: string): void {
+    this.accessor.open(onReceive, group)
   }
 
   /**
