@@ -33,7 +33,8 @@
     "sessionStorage",
     "localStorage",
     "indexedDB",
-    "document"
+    "document",
+    "crypto"
   ],
   "functions": [
     "eval",

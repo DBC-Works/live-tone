@@ -12,6 +12,7 @@ import {
 } from './states'
 import { newAccessor } from '@/communications/ws/WSServerAccessor'
 import { WebSocketConnector } from '@/communications/ws/WebSocketConnector'
+import { createErrorFrom, validateCode } from '@/utilities/validation'
 
 /**
  * Running state atom
@@ -22,25 +23,21 @@ export const runningStateAtom = atom(runningState)
  * Update write-only atom
  */
 export const updateAtom = atom(null, (_, set) => {
-  set(runningStateAtom, (runningState) => {
-    return {
-      ...runningState,
-      updated: true,
-    }
-  })
+  set(runningStateAtom, (runningState) => ({
+    ...runningState,
+    updated: true,
+  }))
 })
 
 /**
  * Play write-only atom
  */
 export const playAtom = atom(null, (_, set) => {
-  set(runningStateAtom, (runningState) => {
-    return {
-      ...runningState,
-      nowPlaying: true,
-      updated: false,
-    }
-  })
+  set(runningStateAtom, (runningState) => ({
+    ...runningState,
+    nowPlaying: true,
+    updated: false,
+  }))
 })
 
 /**
@@ -78,12 +75,10 @@ export const runSettingsAtom = atomWithStorage('RunSettings', runSettings)
 export const cancelTransportOnStopRunSettingsAtom = atom(
   (get) => get(runSettingsAtom).cancelTransportOnStop,
   (_, set) => {
-    set(runSettingsAtom, (runSettings) => {
-      return {
-        ...runSettings,
-        cancelTransportOnStop: !runSettings.cancelTransportOnStop,
-      }
-    })
+    set(runSettingsAtom, (runSettings) => ({
+      ...runSettings,
+      cancelTransportOnStop: !runSettings.cancelTransportOnStop,
+    }))
   }
 )
 
@@ -98,12 +93,10 @@ export const editSettingsAtom = atomWithStorage('EditSettings', editSettings)
 export const enableLiveAutoCompletionEditSettingsAtom = atom(
   (get) => get(editSettingsAtom).enableLiveAutoCompletion,
   (_, set) => {
-    set(editSettingsAtom, (editSettings) => {
-      return {
-        ...editSettings,
-        enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
-      }
-    })
+    set(editSettingsAtom, (editSettings) => ({
+      ...editSettings,
+      enableLiveAutoCompletion: !editSettings.enableLiveAutoCompletion,
+    }))
   }
 )
 
@@ -118,12 +111,10 @@ export const sharingSettingsAtom = atom(sharingSettings)
 export const webSocketServerUrlAtom = atom(
   (get) => get(sharingSettingsAtom).webSocketServerUrl,
   (_, set, value: string) => {
-    set(sharingSettingsAtom, (sharingSettings) => {
-      return {
-        ...sharingSettings,
-        webSocketServerUrl: value,
-      }
-    })
+    set(sharingSettingsAtom, (sharingSettings) => ({
+      ...sharingSettings,
+      webSocketServerUrl: value,
+    }))
   }
 )
 
@@ -133,12 +124,10 @@ export const webSocketServerUrlAtom = atom(
 export const tagOfCodeAtom = atom(
   (get) => get(sharingSettingsAtom).tagOfCode,
   (_, set, value: string) => {
-    set(sharingSettingsAtom, (sharingSettings) => {
-      return {
-        ...sharingSettings,
-        tagOfCode: value,
-      }
-    })
+    set(sharingSettingsAtom, (sharingSettings) => ({
+      ...sharingSettings,
+      tagOfCode: value,
+    }))
   }
 )
 
@@ -146,8 +135,8 @@ export const tagOfCodeAtom = atom(
  * Connectable state read-only atom
  */
 export const connectableStateAtom = atom((get) => {
-  const { webSocketServerUrl, tagOfCode } = get(sharingSettingsAtom)
-  if (webSocketServerUrl.length === 0 || tagOfCode.length === 0) {
+  const { webSocketServerUrl } = get(sharingSettingsAtom)
+  if (webSocketServerUrl.length === 0) {
     return ConnectableStates.LackOfInput
   }
 
@@ -183,10 +172,11 @@ export const connectAtom = atom(null, (get, set) => {
   try {
     if (connector === null) {
       const accessor = newAccessor(webSocketServerUrl, (state, asError) => {
-        set(connectionInfoAtom, {
+        set(connectionInfoAtom, (connectionInfo) => ({
+          ...connectionInfo,
           connector: state === ConnectionStates.Disconnected ? null : connector,
           state,
-        })
+        }))
         if (asError !== false) {
           const error = new Error('Fail to connect to WebSocket server')
           set(errorAtom, { error, type: ErrorTypes.Connection })
@@ -197,7 +187,7 @@ export const connectAtom = atom(null, (get, set) => {
       // eslint-disable-next-line no-unused-vars
       connector.open((_message) => {
         // TODO: implement
-      })
+      }, 'LiveTone')
       state = ConnectionStates.Connecting
     }
   } catch (e) {
@@ -205,11 +195,12 @@ export const connectAtom = atom(null, (get, set) => {
     connector = null
     state = ConnectionStates.Disconnected
     throw e
-  }
-
-  return {
-    connector,
-    state,
+  } finally {
+    set(connectionInfoAtom, (connectionInfo) => ({
+      ...connectionInfo,
+      connector,
+      state,
+    }))
   }
 })
 
@@ -228,10 +219,46 @@ export const disconnectAtom = atom(null, (get, set) => {
   } catch (e) {
     set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
     throw e
+  } finally {
+    set(connectionInfoAtom, (connectionInfo) => ({
+      ...connectionInfo,
+      connector: null,
+      state: ConnectionStates.Disconnected,
+    }))
+  }
+})
+
+/**
+ * Share code write-only atom
+ */
+export const shareCodeAtom = atom(null, (get, set) => {
+  const code = get(liveCodeAtom)
+  set(errorAtom, { error: null, type: ErrorTypes.Eval })
+  try {
+    const errors = validateCode(code)
+    if (0 < errors.length) {
+      throw createErrorFrom(errors)
+    }
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Eval })
+    throw e
   }
 
-  return {
-    connector: null,
-    state: ConnectionStates.Disconnected,
+  try {
+    set(errorAtom, { error: null, type: ErrorTypes.Connection })
+
+    const { tagOfCode } = get(sharingSettingsAtom)
+    const { connector, id } = get(connectionInfoAtom)
+
+    connector?.send(
+      JSON.stringify({
+        id,
+        tag: tagOfCode,
+        code,
+      })
+    )
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
+    throw e
   }
 })

@@ -174,6 +174,7 @@ describe('executionOperation', () => {
       ['localStorage', 'localStorage.setItem("Disallowed", "Disallowed");'],
       ['indexedDB', 'indexedDB.open("Disallowed")'],
       ['document', 'document;'],
+      ['crypto', 'crypto.randomUUID();'],
     ])(
       'should throw an error if code refers `%s` property',
       (keyword: string, code: string) => {

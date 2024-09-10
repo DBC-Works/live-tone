@@ -3,12 +3,14 @@ import { useHydrateAtoms } from 'jotai/utils'
 import * as Tone from 'tone'
 
 import { ErrorTypes } from '@/states/types'
+import { webSocketConnectionInfo } from '@/states/states'
 import { errorAtom, liveCodeAtom } from '@/states/atoms'
 import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
-import { getByRole, render, screen } from '@testing-library/react'
+import { act, getByRole, render, screen } from '@testing-library/react'
+import { getTestDoubleAccessor } from '@/__mock__/WSServerAccessor'
 
 describe('App component', () => {
   type JotaiPropsType = {
@@ -338,7 +340,7 @@ describe('App component', () => {
         expect(disconnectButton).toBeEnabled()
 
         expect(urlTextbox).toHaveAttribute('readonly')
-        expect(tagTextbox).toHaveAttribute('readonly')
+        expect(tagTextbox).not.toHaveAttribute('readonly')
       })
 
       it('should try to disconnect from a WebSocket server when clicked while connecting and, if successful, update associated components', async () => {
@@ -366,6 +368,161 @@ describe('App component', () => {
 
         expect(urlTextbox).not.toHaveAttribute('readonly')
         expect(tagTextbox).not.toHaveAttribute('readonly')
+      })
+    })
+
+    describe('"Share" button', () => {
+      it('should be visible while connected', async () => {
+        // arrange
+        setup()
+        expect(
+          screen.queryByRole('button', {
+            name: 'Share',
+          })
+        ).not.toBeInTheDocument()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        expect(
+          screen.queryByRole('button', {
+            name: 'Share',
+          })
+        ).not.toBeInTheDocument()
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+        // assert
+        const shareButton = await screen.findByRole('button', {
+          name: 'Share',
+        })
+        expect(shareButton).toBeInTheDocument()
+        expect(shareButton).toBeEnabled()
+      })
+
+      it('should enable even if an error is reported', async () => {
+        // arrange
+        const { rerender } = setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+        await simulateTypingOfText('Tone.getTransport()start(')
+
+        // act
+        try {
+          await user.click(screen.getByRole('button', { name: 'Run' }))
+        } catch (e) {
+          rerender(<AppProvider />)
+        }
+
+        // assert
+        const shareButton = await screen.findByRole('button', {
+          name: 'Share',
+        })
+        expect(shareButton).toBeEnabled()
+      })
+
+      it('should disable if tag is empty', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+        // assert
+        const shareButton = await screen.findByRole('button', {
+          name: 'Share',
+        })
+        expect(shareButton).toBeInTheDocument()
+        expect(shareButton).toBeDisabled()
+      })
+
+      it.todo('should disable if the same tag is found in received codes')
+
+      it('should send code', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+        await simulateTypingOfText('Tone.getTransport().start()')
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Share' }))
+
+        // assert
+        const message = getTestDoubleAccessor()?.latestMessage
+        expect(message).not.toBeNull()
+        const data = JSON.parse(message!)
+        expect(data.id).toEqual(webSocketConnectionInfo.id)
+        expect(data.tag).toEqual('Tag')
+        expect(data.code).toEqual('Tone.getTransport().start()')
+      })
+
+      it('should not send code if code is invalid', async () => {
+        // arrange
+        const { rerender } = setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+        await simulateTypingOfText('Tone.getTransport()start(')
+
+        // act
+        try {
+          await user.click(screen.getByRole('button', { name: 'Share' }))
+        } catch (e) {
+          rerender(<AppProvider />)
+        }
+
+        // assert
+        const message = getTestDoubleAccessor()?.latestMessage
+        expect(message).toBeNull()
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      it('should not be visible while disconnected', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+        const tagTextbox = screen.getByLabelText('Tag of your code')
+        tagTextbox.focus()
+        await user.type(tagTextbox, 'Tag')
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+        expect(
+          await screen.findByRole('button', {
+            name: 'Share',
+          })
+        ).toBeInTheDocument()
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Disconnect' }))
+
+        // assert
+        expect(
+          screen.queryByRole('button', {
+            name: 'Share',
+          })
+        ).not.toBeInTheDocument()
       })
     })
   })
@@ -418,7 +575,9 @@ describe('App component', () => {
         ).toBeInTheDocument()
 
         // act
-        window.dispatchEvent(new Event('beforeunload'))
+        act(() => {
+          window.dispatchEvent(new Event('beforeunload'))
+        })
 
         // assert
         const connectButton = await screen.findByRole('button', {

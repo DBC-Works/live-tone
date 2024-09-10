@@ -54,5 +54,6 @@ export const runningState: RunningState = {
  */
 export const webSocketConnectionInfo: WebSocketConnectionInfo = {
   connector: null,
+  id: crypto.randomUUID(),
   state: ConnectionStates.Disconnected,
 }
