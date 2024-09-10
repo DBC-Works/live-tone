@@ -12,6 +12,7 @@ import {
 } from './states'
 import { newAccessor } from '@/communications/ws/WSServerAccessor'
 import { WebSocketConnector } from '@/communications/ws/WebSocketConnector'
+import { createErrorFrom, validateCode } from '@/utilities/validation'
 
 /**
  * Running state atom
@@ -171,10 +172,11 @@ export const connectAtom = atom(null, (get, set) => {
   try {
     if (connector === null) {
       const accessor = newAccessor(webSocketServerUrl, (state, asError) => {
-        set(connectionInfoAtom, {
+        set(connectionInfoAtom, (connectionInfo) => ({
+          ...connectionInfo,
           connector: state === ConnectionStates.Disconnected ? null : connector,
           state,
-        })
+        }))
         if (asError !== false) {
           const error = new Error('Fail to connect to WebSocket server')
           set(errorAtom, { error, type: ErrorTypes.Connection })
@@ -185,7 +187,7 @@ export const connectAtom = atom(null, (get, set) => {
       // eslint-disable-next-line no-unused-vars
       connector.open((_message) => {
         // TODO: implement
-      })
+      }, 'LiveTone')
       state = ConnectionStates.Connecting
     }
   } catch (e) {
@@ -194,10 +196,11 @@ export const connectAtom = atom(null, (get, set) => {
     state = ConnectionStates.Disconnected
     throw e
   } finally {
-    set(connectionInfoAtom, {
+    set(connectionInfoAtom, (connectionInfo) => ({
+      ...connectionInfo,
       connector,
       state,
-    })
+    }))
   }
 })
 
@@ -217,9 +220,45 @@ export const disconnectAtom = atom(null, (get, set) => {
     set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
     throw e
   } finally {
-    set(connectionInfoAtom, {
+    set(connectionInfoAtom, (connectionInfo) => ({
+      ...connectionInfo,
       connector: null,
       state: ConnectionStates.Disconnected,
-    })
+    }))
+  }
+})
+
+/**
+ * Share code write-only atom
+ */
+export const shareCodeAtom = atom(null, (get, set) => {
+  const code = get(liveCodeAtom)
+  set(errorAtom, { error: null, type: ErrorTypes.Eval })
+  try {
+    const errors = validateCode(code)
+    if (0 < errors.length) {
+      throw createErrorFrom(errors)
+    }
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Eval })
+    throw e
+  }
+
+  try {
+    set(errorAtom, { error: null, type: ErrorTypes.Connection })
+
+    const { tagOfCode } = get(sharingSettingsAtom)
+    const { connector, id } = get(connectionInfoAtom)
+
+    connector?.send(
+      JSON.stringify({
+        id,
+        tag: tagOfCode,
+        code,
+      })
+    )
+  } catch (e) {
+    set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
+    throw e
   }
 })

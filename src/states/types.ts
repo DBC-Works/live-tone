@@ -166,6 +166,38 @@ export type ConnectionState =
  * WebSocket connection info
  */
 export type WebSocketConnectionInfo = {
+  /**
+   * WebSocketConnector instance
+   */
   connector: WebSocketConnector | null
+
+  /**
+   * ID
+   */
+  id: string
+
+  /**
+   * Connection state
+   */
   state: ConnectionState
+}
+
+/**
+ * Sharing code info
+ */
+export type SharingCodeInfo = {
+  /**
+   * ID
+   */
+  id: string
+
+  /**
+   * Tag
+   */
+  tag: string
+
+  /**
+   * Code
+   */
+  code: string
 }
