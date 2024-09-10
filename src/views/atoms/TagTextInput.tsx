@@ -1,8 +1,7 @@
 import { ChangeEvent, useCallback } from 'react'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom } from 'jotai'
 
-import { ConnectionStates } from '@/states/types'
-import { connectionStateAtom, tagOfCodeAtom } from '@/states/atoms'
+import { tagOfCodeAtom } from '@/states/atoms'
 import { LabeledTextInput } from '@/views/atoms/LabeledTextInput'
 
 type Props = React.ComponentProps<'input'>
@@ -13,7 +12,6 @@ type Props = React.ComponentProps<'input'>
  */
 export const TagTextInput: React.FC<Props> = (): JSX.Element => {
   const [tagOfCode, setTagOfCode] = useAtom(tagOfCodeAtom)
-  const connectionState = useAtomValue(connectionStateAtom)
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -27,7 +25,6 @@ export const TagTextInput: React.FC<Props> = (): JSX.Element => {
       id="tag-of-your-code"
       type="text"
       value={tagOfCode}
-      readOnly={connectionState === ConnectionStates.Connected}
       onChange={handleChange}
     >
       Tag of your code

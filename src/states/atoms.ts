@@ -135,8 +135,8 @@ export const tagOfCodeAtom = atom(
  * Connectable state read-only atom
  */
 export const connectableStateAtom = atom((get) => {
-  const { webSocketServerUrl, tagOfCode } = get(sharingSettingsAtom)
-  if (webSocketServerUrl.length === 0 || tagOfCode.length === 0) {
+  const { webSocketServerUrl } = get(sharingSettingsAtom)
+  if (webSocketServerUrl.length === 0) {
     return ConnectableStates.LackOfInput
   }
 

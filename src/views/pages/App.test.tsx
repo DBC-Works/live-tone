@@ -340,7 +340,7 @@ describe('App component', () => {
         expect(disconnectButton).toBeEnabled()
 
         expect(urlTextbox).toHaveAttribute('readonly')
-        expect(tagTextbox).toHaveAttribute('readonly')
+        expect(tagTextbox).not.toHaveAttribute('readonly')
       })
 
       it('should try to disconnect from a WebSocket server when clicked while connecting and, if successful, update associated components', async () => {
@@ -372,7 +372,7 @@ describe('App component', () => {
     })
 
     describe('"Share" button', () => {
-      it('should be visible and enable while connected', async () => {
+      it('should be visible while connected', async () => {
         // arrange
         setup()
         expect(
@@ -426,7 +426,25 @@ describe('App component', () => {
         const shareButton = await screen.findByRole('button', {
           name: 'Share',
         })
-        expect(shareButton).not.toBeDisabled()
+        expect(shareButton).toBeEnabled()
+      })
+
+      it('should disable if tag is empty', async () => {
+        // arrange
+        setup()
+        const urlTextbox = screen.getByLabelText('WebSocket server URL')
+        urlTextbox.focus()
+        await user.type(urlTextbox, 'wss://example.com')
+
+        // act
+        await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+        // assert
+        const shareButton = await screen.findByRole('button', {
+          name: 'Share',
+        })
+        expect(shareButton).toBeInTheDocument()
+        expect(shareButton).toBeDisabled()
       })
 
       it.todo('should disable if the same tag is found in received codes')
