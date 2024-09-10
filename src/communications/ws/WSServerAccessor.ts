@@ -114,7 +114,7 @@ export class GenericWebSocketServerAccessor implements WebSocketServerAccessor {
    * @param _group Group to send(unused)
    */
   // eslint-disable-next-line no-unused-vars
-  public async open(onReceive: ReceiveHandler, _group: string): Promise<void> {
+  public open(onReceive: ReceiveHandler, _group: string): void {
     this.client = new WebSocket(this.url)
     this.onChangeState(ConnectionStates.Connecting, false)
 
@@ -236,7 +236,7 @@ export class AzureWebPubSubAccessor implements WebSocketServerAccessor {
    * @param onReceive Receive handler
    * @param group Group to send
    */
-  public async open(onReceive: ReceiveHandler, group: string): Promise<void> {
+  public open(onReceive: ReceiveHandler, group: string): void {
     this.client = new WebSocket(this.url, 'json.webpubsub.azure.v1')
     this.group = group
     this.onChangeState(ConnectionStates.Connecting, false)
