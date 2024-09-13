@@ -10,6 +10,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import html from 'eslint-plugin-html'
 import jsdoc from 'eslint-plugin-jsdoc'
 import markdown from 'eslint-plugin-markdown'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 
 const compat = new FlatCompat()
 
@@ -35,6 +36,9 @@ export default [
       parserOptions: {
         sourceType: 'module',
         ecmaVersion: 2020,
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
     plugins: {
@@ -43,12 +47,15 @@ export default [
       markdown,
       jsdoc,
       'react-refresh': reactRefresh,
+      'jsx-a11y': jsxA11y,
     },
     rules: {
+      complexity: ['error', 10],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
+      'jsx-a11y/alt-text': 'error',
     },
   },
 ]
