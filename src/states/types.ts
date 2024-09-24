@@ -201,3 +201,10 @@ export type SharingCodeInfo = {
    */
   code: string
 }
+
+/**
+ * Receive code info
+ */
+export type ReceiveCodeInfo = SharingCodeInfo & {
+  latest: boolean
+}

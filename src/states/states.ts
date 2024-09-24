@@ -3,6 +3,7 @@ import {
   EditSettings,
   ErrorInfo,
   ErrorTypes,
+  ReceiveCodeInfo,
   RunningState,
   RunSettings,
   SharingSettings,
@@ -57,3 +58,8 @@ export const webSocketConnectionInfo: WebSocketConnectionInfo = {
   id: crypto.randomUUID(),
   state: ConnectionStates.Disconnected,
 }
+
+/**
+ * Received codes
+ */
+export const receivedCodes: ReceiveCodeInfo[] = []
