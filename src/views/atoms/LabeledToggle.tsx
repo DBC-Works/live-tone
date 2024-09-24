@@ -16,7 +16,6 @@ type Props = React.ComponentProps<'input'> & {
  */
 export const LabeledToggle: React.FC<Props> = ({
   id,
-
   checked,
   children,
   toggleColorClassName,

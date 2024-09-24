@@ -19,16 +19,18 @@ export type Api = {
 
 /**
  * Execute code
- * @param code Code to execute
+ * @param codes Codes to execute
  * @param api Api container object
  */
-export const executeCode = (code: string, api: Api): void => {
+export const executeCode = (codes: string[], api: Api): void => {
   try {
     api.setError({ error: null, type: ErrorTypes.Eval })
 
-    const errors = validateCode(code)
-    if (0 < errors.length) {
-      throw createErrorFrom(errors)
+    for (const code of codes) {
+      const errors = validateCode(code)
+      if (0 < errors.length) {
+        throw createErrorFrom(errors)
+      }
     }
 
     const LiveTone = Object.freeze({
@@ -39,7 +41,11 @@ export const executeCode = (code: string, api: Api): void => {
       Nmb,
       Chr,
     })
-    new Function('Tone', 'LiveTone', `'use strict';${code}`)(Tone, LiveTone)
+    new Function(
+      'Tone',
+      'LiveTone',
+      `'use strict';${codes.map((code) => `{\n${code}\n}`).join('\n')}`
+    )(Tone, LiveTone)
     api.setPlay()
   } catch (e) {
     api.setError({ error: e as Error, type: ErrorTypes.Eval })
