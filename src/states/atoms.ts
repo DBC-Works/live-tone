@@ -208,7 +208,7 @@ export const connectAtom = atom(null, (get, set) => {
               receivedCodes[index] = receivedMessage
             }
 
-            set(receivedCodesAtom, receivedCodes)
+            set(receivedCodesAtom, [...receivedCodes])
           }
         } catch (e) {
           set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
