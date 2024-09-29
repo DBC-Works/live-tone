@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import AceEditor from 'react-ace'
 import 'ace-builds/src-noconflict/mode-javascript'
 import 'ace-builds/src-noconflict/theme-xcode'
@@ -9,6 +9,7 @@ import {
   editSettingsAtom,
   liveCodeAtom,
   runningStateAtom,
+  selectedCodeAtom,
   updateAtom,
 } from '@/states/atoms'
 
@@ -20,19 +21,22 @@ type Props = React.ComponentProps<'div'>
  * @returns Rendering result
  */
 export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
-  const [liveCode, setLiveCode] = useAtom(liveCodeAtom)
+  const { editable, code } = useAtomValue(selectedCodeAtom)
+  const setLiveCode = useSetAtom(liveCodeAtom)
   const { enableLiveAutoCompletion } = useAtomValue(editSettingsAtom)
   const { updated } = useAtomValue(runningStateAtom)
   const update = useSetAtom(updateAtom)
 
   const handleChange = useCallback(
     (value: string) => {
-      setLiveCode(() => value)
-      if (updated === false) {
-        update()
+      if (editable !== false) {
+        setLiveCode(() => value)
+        if (updated === false) {
+          update()
+        }
       }
     },
-    [setLiveCode, update, updated]
+    [editable, setLiveCode, update, updated]
   )
 
   return (
@@ -49,7 +53,8 @@ export const CodeEditor: React.FC<Props> = ({ id }: Props): JSX.Element => {
       showPrintMargin={false}
       enableBasicAutocompletion={true}
       enableLiveAutocompletion={enableLiveAutoCompletion}
-      value={liveCode}
+      value={code}
+      readOnly={editable === false}
       onChange={handleChange}
     />
   )

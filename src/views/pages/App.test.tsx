@@ -2,14 +2,21 @@ import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import * as Tone from 'tone'
 
-import { ErrorTypes } from '@/states/types'
+import { ErrorTypes, ReceiveCodeInfo } from '@/states/types'
 import { webSocketConnectionInfo } from '@/states/states'
-import { errorAtom, liveCodeAtom } from '@/states/atoms'
+import { errorAtom, liveCodeAtom, receivedCodesAtom } from '@/states/atoms'
 import { App } from './App'
 
 import '@testing-library/jest-dom/vitest'
 import { UserEvent, userEvent } from '@testing-library/user-event'
-import { act, getByRole, render, screen } from '@testing-library/react'
+import {
+  act,
+  getByRole,
+  getByText,
+  queryByText,
+  render,
+  screen,
+} from '@testing-library/react'
 import { getTestDoubleAccessor } from '@/__mock__/WSServerAccessor'
 
 describe('App component', () => {
@@ -37,10 +44,13 @@ describe('App component', () => {
     </Provider>
   )
 
-  const AppProvider = () => (
+  const AppProvider: React.FC<{ receivedCodes?: ReceiveCodeInfo[] }> = ({
+    receivedCodes,
+  }) => (
     <TestProvider
       initialValues={[
         [liveCodeAtom, ''],
+        [receivedCodesAtom, receivedCodes],
         [errorAtom, { error: null, type: ErrorTypes.Eval }],
       ]}
     >
@@ -48,17 +58,21 @@ describe('App component', () => {
     </TestProvider>
   )
 
-  const setup = () => {
+  const setup = (receivedCodes: ReceiveCodeInfo[] = []) => {
     user = userEvent.setup()
-    return render(<AppProvider />)
+    return render(<AppProvider receivedCodes={receivedCodes} />)
   }
 
-  const simulateTypingOfText = async (text: string) => {
+  const getCodeEditorTextBox = () => {
     const codeSectionHeader = screen.getByRole('heading', {
       level: 2,
       name: 'Your code',
     })
-    const textbox = getByRole(codeSectionHeader.closest('section')!, 'textbox')
+    return getByRole(codeSectionHeader.closest('section')!, 'textbox')
+  }
+
+  const simulateTypingOfText = async (text: string) => {
+    const textbox = getCodeEditorTextBox()
     textbox.focus()
     await user.type(textbox, text)
   }
@@ -76,6 +90,27 @@ describe('App component', () => {
           expect(
             getByRole(tablist, 'tab', { name: 'Your code', selected: true })
           ).toBeInTheDocument()
+        })
+
+        it('should switch code in code editor by selecting tab', async () => {
+          // arrange
+          const receivedMessage = {
+            id: crypto.randomUUID(),
+            tag: 'Received code',
+            code: '// Received code',
+            latest: true,
+          }
+          const { rerender } = setup([receivedMessage])
+          expect(getCodeEditorTextBox()).not.toHaveAttribute('readonly')
+
+          // act
+          await userEvent.click(
+            screen.getByRole('tab', { name: /Received code/ })
+          )
+          rerender(<AppProvider />)
+
+          // assert
+          expect(getCodeEditorTextBox()).toHaveAttribute('readonly')
         })
       })
 
@@ -211,6 +246,26 @@ describe('App component', () => {
 
         // assert
         expect(await screen.findByRole('button', { name: 'Run' })).toBeEnabled()
+      })
+
+      it('should run code if click', async () => {
+        // arrange
+        const receivedMessage = {
+          id: crypto.randomUUID(),
+          tag: 'Received code',
+          code: '// Received code',
+          latest: true,
+        }
+        setup([receivedMessage])
+        await simulateTypingOfText('LiveTone.start()')
+
+        // act
+        await userEvent.click(
+          await screen.findByRole('button', { name: 'Run' })
+        )
+
+        // assert
+        expect(screen.getByRole('status')).toHaveTextContent(/Playing/)
       })
     })
 
@@ -558,36 +613,141 @@ describe('App component', () => {
     })
   })
 
-  describe('lifecycle', () => {
-    describe('unload', () => {
-      it('should try to disconnect from a WebSocket server if connected', async () => {
-        // arrange
-        setup()
-        const urlTextbox = screen.getByLabelText('WebSocket server URL')
-        urlTextbox.focus()
-        await user.type(urlTextbox, 'wss://example.com')
-        const tagTextbox = screen.getByLabelText('Tag of your code')
-        tagTextbox.focus()
-        await user.type(tagTextbox, 'Tag')
-        await user.click(screen.getByRole('button', { name: 'Connect' }))
-        expect(
-          await screen.findByRole('button', { name: 'Disconnect' })
-        ).toBeInTheDocument()
+  describe('event', () => {
+    describe('lifecycle', () => {
+      describe('unload', () => {
+        it('should try to disconnect from a WebSocket server if connected', async () => {
+          // arrange
+          setup()
+          const urlTextbox = screen.getByLabelText('WebSocket server URL')
+          urlTextbox.focus()
+          await user.type(urlTextbox, 'wss://example.com')
+          const tagTextbox = screen.getByLabelText('Tag of your code')
+          tagTextbox.focus()
+          await user.type(tagTextbox, 'Tag')
+          await user.click(screen.getByRole('button', { name: 'Connect' }))
+          expect(
+            await screen.findByRole('button', { name: 'Disconnect' })
+          ).toBeInTheDocument()
 
-        // act
-        act(() => {
-          window.dispatchEvent(new Event('beforeunload'))
+          // act
+          act(() => {
+            window.dispatchEvent(new Event('beforeunload'))
+          })
+
+          // assert
+          const connectButton = await screen.findByRole('button', {
+            name: 'Connect',
+          })
+          expect(connectButton).toBeInTheDocument()
+          expect(connectButton).toBeEnabled()
+
+          expect(urlTextbox).not.toHaveAttribute('readonly')
+          expect(tagTextbox).not.toHaveAttribute('readonly')
+        })
+      })
+    })
+
+    describe('WebSocket', () => {
+      describe('message', () => {
+        it('should add message to receive list if message ID is not in the list', async () => {
+          // arrange
+          const { rerender } = setup()
+          const urlTextbox = screen.getByLabelText('WebSocket server URL')
+          urlTextbox.focus()
+          await user.type(urlTextbox, 'wss://example.com')
+          const tagTextbox = screen.getByLabelText('Tag of your code')
+          tagTextbox.focus()
+          await user.type(tagTextbox, 'Tag')
+          await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+          // act
+          const message = {
+            tag: 'received code',
+            id: crypto.randomUUID(),
+            code: '// code',
+          }
+          getTestDoubleAccessor()?.simulateReceiveMessage(
+            JSON.stringify(message)
+          )
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getAllByRole('tab')).toHaveLength(2)
+          expect(
+            getByText(screen.getByRole('tablist'), message.tag)
+          ).toBeInTheDocument()
         })
 
-        // assert
-        const connectButton = await screen.findByRole('button', {
-          name: 'Connect',
-        })
-        expect(connectButton).toBeInTheDocument()
-        expect(connectButton).toBeEnabled()
+        it('should update received message in list code if message ID is in the list', async () => {
+          // arrange
+          const { rerender } = setup()
+          const urlTextbox = screen.getByLabelText('WebSocket server URL')
+          urlTextbox.focus()
+          await user.type(urlTextbox, 'wss://example.com')
+          const tagTextbox = screen.getByLabelText('Tag of your code')
+          tagTextbox.focus()
+          await user.type(tagTextbox, 'Tag')
+          await user.click(screen.getByRole('button', { name: 'Connect' }))
+          const id = crypto.randomUUID()
+          const firstMessage = {
+            tag: '1st received',
+            id,
+            code: '// code',
+          }
+          getTestDoubleAccessor()?.simulateReceiveMessage(
+            JSON.stringify(firstMessage)
+          )
+          rerender(<AppProvider />)
+          expect(screen.getAllByRole('tab')).toHaveLength(2)
+          expect(getByText(screen.getByRole('tablist'), firstMessage.tag))
 
-        expect(urlTextbox).not.toHaveAttribute('readonly')
-        expect(tagTextbox).not.toHaveAttribute('readonly')
+          // act
+          const secondMessage = {
+            tag: '2nd message',
+            id,
+            code: '// code',
+          }
+          getTestDoubleAccessor()?.simulateReceiveMessage(
+            JSON.stringify(secondMessage)
+          )
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getAllByRole('tab')).toHaveLength(2)
+          expect(
+            getByText(screen.getByRole('tablist'), secondMessage.tag)
+          ).toBeInTheDocument()
+        })
+
+        it('should discard received message if message was send by self', async () => {
+          // arrange
+          const { rerender } = setup()
+          const urlTextbox = screen.getByLabelText('WebSocket server URL')
+          urlTextbox.focus()
+          await user.type(urlTextbox, 'wss://example.com')
+          const tagTextbox = screen.getByLabelText('Tag of your code')
+          tagTextbox.focus()
+          await user.type(tagTextbox, 'Tag')
+          await user.click(screen.getByRole('button', { name: 'Connect' }))
+
+          // act
+          const message = {
+            tag: 'sended code',
+            id: webSocketConnectionInfo.id,
+            code: '// code',
+          }
+          getTestDoubleAccessor()?.simulateReceiveMessage(
+            JSON.stringify(message)
+          )
+          rerender(<AppProvider />)
+
+          // assert
+          expect(screen.getAllByRole('tab')).toHaveLength(1)
+          expect(
+            queryByText(screen.getByRole('tablist'), message.tag)
+          ).not.toBeInTheDocument()
+        })
       })
     })
   })

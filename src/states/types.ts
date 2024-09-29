@@ -201,3 +201,28 @@ export type SharingCodeInfo = {
    */
   code: string
 }
+
+/**
+ * Receive code info
+ */
+export type ReceiveCodeInfo = SharingCodeInfo & {
+  /**
+   * Latest flag
+   */
+  latest: boolean
+}
+
+/**
+ * Playable code info
+ */
+export type PlayableCode = {
+  /**
+   * Main code
+   */
+  main: boolean
+
+  /**
+   * Code to play
+   */
+  code: string
+}

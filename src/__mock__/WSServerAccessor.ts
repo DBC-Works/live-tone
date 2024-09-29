@@ -7,6 +7,8 @@ import { ConnectionStates } from '@/states/types'
 
 interface Accessor extends WebSocketServerAccessor {
   get latestMessage(): string | null
+  // eslint-disable-next-line no-unused-vars
+  simulateReceiveMessage(_message: string): void
 }
 
 class TestDoubleAccessor implements Accessor {
@@ -42,6 +44,13 @@ class TestDoubleAccessor implements Accessor {
     }
     this.sendedMessage = message
 
+    this.onReceive(message)
+  }
+
+  public simulateReceiveMessage(message: string): void {
+    if (this.onReceive === null) {
+      throw new Error()
+    }
     this.onReceive(message)
   }
 

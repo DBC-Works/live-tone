@@ -5,6 +5,7 @@ import { ConnectableStates, ConnectionStates, ErrorTypes } from './types'
 import {
   editSettings,
   errorInfo,
+  receivedCodes,
   runningState,
   runSettings,
   sharingSettings,
@@ -32,12 +33,16 @@ export const updateAtom = atom(null, (_, set) => {
 /**
  * Play write-only atom
  */
-export const playAtom = atom(null, (_, set) => {
+export const playAtom = atom(null, (get, set) => {
   set(runningStateAtom, (runningState) => ({
     ...runningState,
     nowPlaying: true,
     updated: false,
   }))
+  set(
+    receivedCodesAtom,
+    get(receivedCodesAtom).map((received) => ({ ...received, latest: false }))
+  )
 })
 
 /**
@@ -156,6 +161,11 @@ const connectionInfoAtom = atom(webSocketConnectionInfo)
 export const connectionStateAtom = atom((get) => get(connectionInfoAtom).state)
 
 /**
+ * Received codes atom
+ */
+export const receivedCodesAtom = atom(receivedCodes)
+
+/**
  * Connect write-only atom
  */
 export const connectAtom = atom(null, (get, set) => {
@@ -184,9 +194,26 @@ export const connectAtom = atom(null, (get, set) => {
         }
       })
       connector = WebSocketConnector.newInstance(accessor)
-      // eslint-disable-next-line no-unused-vars
-      connector.open((_message) => {
-        // TODO: implement
+      connector.open((message) => {
+        try {
+          const receivedCodes = get(receivedCodesAtom)
+          const receivedMessage = { ...JSON.parse(message), latest: true }
+          if (receivedMessage.id !== get(connectionInfoAtom).id) {
+            const index = receivedCodes.findIndex(
+              (code) => code.id === receivedMessage.id
+            )
+            if (index < 0) {
+              receivedCodes.push(receivedMessage)
+            } else {
+              receivedCodes[index] = receivedMessage
+            }
+
+            set(receivedCodesAtom, [...receivedCodes])
+          }
+        } catch (e) {
+          set(errorAtom, { error: e as Error, type: ErrorTypes.Connection })
+          throw e
+        }
       }, 'LiveTone')
       state = ConnectionStates.Connecting
     }
@@ -262,3 +289,31 @@ export const shareCodeAtom = atom(null, (get, set) => {
     throw e
   }
 })
+
+/**
+ * Selected tab index atom
+ */
+export const selectedTabIndexAtom = atom<number>(0)
+
+/**
+ * Selected code read-only atom
+ */
+export const selectedCodeAtom = atom((get) => {
+  const selectedTabIndex = get(selectedTabIndexAtom)
+  const code =
+    selectedTabIndex === 0
+      ? get(liveCodeAtom)
+      : get(receivedCodesAtom)[selectedTabIndex - 1].code
+  return { editable: selectedTabIndex === 0, code }
+})
+
+/**
+ * Playable codes read-only atom
+ */
+export const playableCodesAtom = atom((get) => [
+  ...get(receivedCodesAtom).map(({ code }) => ({
+    main: false,
+    code,
+  })),
+  { main: true, code: get(liveCodeAtom) },
+])
