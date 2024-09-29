@@ -257,7 +257,7 @@ describe('App component', () => {
           latest: true,
         }
         setup([receivedMessage])
-        await simulateTypingOfText('Tone.getTransport().start()')
+        await simulateTypingOfText('LiveTone.start()')
 
         // act
         await userEvent.click(

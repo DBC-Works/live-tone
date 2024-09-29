@@ -26,7 +26,7 @@ describe('executionOperation', () => {
       const apiMock = createApiMock()
 
       // act
-      executeCode(['Tone.getTransport().start()'], apiMock)
+      executeCode([{ main: true, code: 'LiveTone.start()' }], apiMock)
 
       // assert
       expect(apiMock.setPlay).toHaveBeenCalledTimes(1)
@@ -43,7 +43,7 @@ describe('executionOperation', () => {
 
       // act
       expect(() => {
-        executeCode(['invalid code'], apiMock)
+        executeCode([{ main: true, code: 'invalid code' }], apiMock)
       }).toThrow()
 
       // assert
@@ -92,7 +92,7 @@ describe('executionOperation', () => {
 
         // act
         expect(() => {
-          executeCode([code], apiMock)
+          executeCode([{ main: true, code }], apiMock)
         }).toThrow()
 
         // assert
@@ -122,7 +122,7 @@ describe('executionOperation', () => {
 
         // act
         expect(() => {
-          executeCode([code], apiMock)
+          executeCode([{ main: true, code }], apiMock)
         }).toThrow()
 
         // assert
@@ -183,7 +183,7 @@ describe('executionOperation', () => {
 
         // act
         expect(() => {
-          executeCode([code], apiMock)
+          executeCode([{ main: true, code }], apiMock)
         }).toThrow()
 
         // assert
@@ -206,7 +206,7 @@ describe('executionOperation', () => {
 
       // act
       expect(() => {
-        executeCode(['alert();window;'], apiMock)
+        executeCode([{ main: true, code: 'alert();window;' }], apiMock)
       }).toThrow()
 
       // assert

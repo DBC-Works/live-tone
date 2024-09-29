@@ -311,6 +311,9 @@ export const selectedCodeAtom = atom((get) => {
  * Playable codes read-only atom
  */
 export const playableCodesAtom = atom((get) => [
-  get(liveCodeAtom),
-  ...get(receivedCodesAtom).map((received) => received.code),
+  ...get(receivedCodesAtom).map(({ code }) => ({
+    main: false,
+    code,
+  })),
+  { main: true, code: get(liveCodeAtom) },
 ])

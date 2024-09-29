@@ -23,7 +23,8 @@ export const RunButton: React.FC = (): JSX.Element => {
     <button
       className="btn btn-primary w-full"
       disabled={
-        playableCodes.reduce((length, code) => code.length + length, 0) === 0
+        playableCodes.reduce((length, { code }) => code.length + length, 0) ===
+        0
       }
       onClick={handleClick}
     >
