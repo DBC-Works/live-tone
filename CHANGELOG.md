@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2024-07-09
+## [v0.3.0] - 2024-10-05
+
+### Added
+
+- Add code sharing function(#22, #23, #24, #25, #26)
+
+### Changed
+
+- Update reference libraries
+
+## [v0.2.0] - 2024-07-09
 
 ### Added
 
@@ -24,12 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update error handling(#6)
 
-## [0.1.0] - 2024-02-10
+## [v0.1.0] - 2024-02-10
 
 ### Added
 
 - Initial project files.
 
-[unreleased]: https://github.com/DBC-Works/live-tone/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.2.0
-[0.1.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.1.0
+[unreleased]: https://github.com/DBC-Works/live-tone/compare/v0.3.0...HEAD
+[v0.3.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.3.0
+[v0.2.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.2.0
+[v0.1.0]: https://github.com/DBC-Works/live-tone/releases/tag/v0.1.0
